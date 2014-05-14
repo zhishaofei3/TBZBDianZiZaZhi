@@ -4,22 +4,18 @@ package core {
 	import data.PageMode;
 	import data.infos.BookInfo;
 
+	import events.UIEvent;
+
 	import flash.events.Event;
 
 	import scenes.LayerManager;
 
 	public class BookManager {
 		private static var pageContainer:PageContainer;
+		private static var toolBarManager:ToolBarManager;
 		private static var bookInfo:BookInfo;
-		public function BookManager() {
-		}
 
-		private static function onResizeHandler(e:Event):void {
-			PageContainer.stageW = TBZBMain.st.stageWidth;
-			PageContainer.stageH = TBZBMain.st.stageHeight;
-			pageContainer.resize();
-			LayerManager.bgContainer.width = PageContainer.stageW;
-			LayerManager.bgContainer.height = PageContainer.stageH;
+		public function BookManager() {
 		}
 
 		public static function init():void {
@@ -27,21 +23,76 @@ package core {
 			TBZBMain.st.addEventListener(Event.RESIZE, onResizeHandler);
 		}
 
+		private static function onResizeHandler(e:Event):void {
+			PageContainer.stageW = TBZBMain.st.stageWidth;
+			PageContainer.stageH = TBZBMain.st.stageHeight;
+			pageContainer.resize();
+			toolBarManager.resize();
+			LayerManager.bgContainer.width = PageContainer.stageW;
+			LayerManager.bgContainer.height = PageContainer.stageH;
+		}
+
 		private static function initUI():void {
-//			ConfigManager.pageMode = PageMode.SINGLE;
-			ConfigManager.pageMode = PageMode.DOUBLE;
+			toolBarManager = new ToolBarManager();
+			toolBarManager.addEventListener(UIEvent.TOOLBARMANAGER_EVENT, onToolBarEvent);
 			initBook();
 		}
 
 		public static function initBook():void {
 			pageContainer = new PageContainer();
+			pageContainer.addEventListener(UIEvent.PAGECONTAINER_EVENT, onPageContainerEvent);
 			LayerManager.bookContainer.addChild(pageContainer);
+		}
+
+		private static function onPageContainerEvent(e:UIEvent):void {
+			switch (e.data.type) {
+				case "page":
+					toolBarManager.setCurrentPage(e.data.page);
+					break;
+			}
 		}
 
 		public static function setBookConfig(bInfo:BookInfo):void {
 			bookInfo = bInfo;
+			toolBarManager.setTotalPage(bInfo.totalPageNum);
 			pageContainer.initData(bInfo);
+			toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 		}
 
+		private static function onToolBarEvent(e:UIEvent):void {
+			switch (e.data.type) {
+				case "single":
+					if (ConfigManager.pageMode == PageMode.SINGLE) {
+						return;
+					}
+					ConfigManager.pageMode = PageMode.SINGLE;
+					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+					pageContainer.refrush();
+					break;
+				case "double":
+					if (ConfigManager.pageMode == PageMode.DOUBLE) {
+						return;
+					}
+					if (PageContainer.currentPageNum % 2 == 0) {//偶数页先变成 单数页
+						PageContainer.currentPageNum--;
+					}
+					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+					ConfigManager.pageMode = PageMode.DOUBLE;
+					pageContainer.refrush();
+					break;
+				case "zoomIn":
+					break;
+				case "zoomOut":
+					break;
+				case "prev":
+					pageContainer.prev();
+					break;
+				case "next":
+					pageContainer.next();
+					break;
+				case "close":
+					break;
+			}
+		}
 	}
 }

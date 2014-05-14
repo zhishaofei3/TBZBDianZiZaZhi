@@ -1,6 +1,6 @@
 package data.infos {
 	public class BookInfo {
-		private var _pageTotalNum:int;
+		private var _totalPageNum:int;
 		private var _bookName:String;
 		private var _pageInfoList:Vector.<PageInfo>;
 
@@ -8,12 +8,12 @@ package data.infos {
 			_pageInfoList = new Vector.<PageInfo>();
 		}
 
-		public function get pageTotalNum():int {
-			return _pageTotalNum;
+		public function get totalPageNum():int {
+			return _totalPageNum;
 		}
 
-		public function set pageTotalNum(value:int):void {
-			_pageTotalNum = value;
+		public function set totalPageNum(value:int):void {
+			_totalPageNum = value;
 		}
 
 		public function get bookName():String {

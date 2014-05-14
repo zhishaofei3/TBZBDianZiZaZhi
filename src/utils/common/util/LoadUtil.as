@@ -94,7 +94,7 @@
 
 		private function errorData(err:int):void {
 			trace("load错误");
-			var o:Object = new Object();
+			var o:Object = {};
 			o.status = err;
 			this.dispatchEvent(new TBZBEvent(eventType, o));
 		}

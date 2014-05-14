@@ -1,6 +1,7 @@
 package {
 
 	import core.BookManager;
+	import core.PageContainer;
 
 	import data.ConfigManager;
 
@@ -29,6 +30,8 @@ package {
 		}
 
 		private function init(e:Event):void {
+			PageContainer.stageW = stage.stageWidth;
+			PageContainer.stageH = stage.stageHeight;
 			TBZBMain.st = stage;
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;

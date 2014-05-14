@@ -19,10 +19,12 @@ package ui {
 		}
 
 		public function setSize(w:Number, h:Number):void {
-			page.setSize(w, h);
+			if (page) {
+				page.setSize(w, h);
+			}
 		}
 
-		public function setPageAnPageInfo(pNum:int, pInfo:PageInfo):void {
+		public function setPageAndPageInfo(pNum:int, pInfo:PageInfo):void {
 			pageNum = pNum;
 			pageInfo = pInfo;
 			createPage();
@@ -38,11 +40,26 @@ package ui {
 		private function onPageEventHandler(e:UIEvent):void {
 			switch (e.data.type) {
 				case "thumbnailImgLoadComplete":
-					dispatchEvent(new UIEvent(UIEvent.SINGLEPAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: e.data.data, pageNum: e.data.pageNum}));
+					dispatchEvent(new UIEvent(UIEvent.SINGLEPAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: e.data.thumbnailBmp, pageNum: e.data.pageNum}));
 					break;
 				case "bigImgLoadComplete":
-					dispatchEvent(new UIEvent(UIEvent.SINGLEPAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: e.data.data, pageNum: e.data.pageNum}));
+					dispatchEvent(new UIEvent(UIEvent.SINGLEPAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: e.data.bigImgBmp, pageNum: e.data.pageNum}));
 					break;
+				case "bigImgLoadError":
+					page.setTip("bigImgLoadError");
+					break;
+				case "thumbnailImgLoadError":
+					page.setTip("thumbnailImgLoadError");
+					break;
+			}
+		}
+
+		public function clear():void {
+			if (page) {
+				page.removeEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+				page.destroy();
+				removeChild(page);
+				page = null;
 			}
 		}
 	}

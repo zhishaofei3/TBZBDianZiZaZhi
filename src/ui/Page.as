@@ -17,7 +17,7 @@ package ui {
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	import flash.net.URLRequest;
-	import flash.utils.setTimeout;
+	import flash.text.TextField;
 
 	import utils.common.component.display.AbstractDisplayObject;
 	import utils.common.util.DisObjUtil;
@@ -39,10 +39,10 @@ package ui {
 		private var thumbnailLoader:Loader;
 		private var bigImgLoader:Loader;
 
-		private var loading:LoadingBar;
+		private var loading:UI_LoadingBar;
 
 		public function Page() {
-			loading = new LoadingBar();
+			loading = new UI_LoadingBar();
 			thumbnailBmpContainer = new Sprite();
 			bigImgBmpContainer = new Sprite();
 			addChild(thumbnailBmpContainer);
@@ -56,15 +56,13 @@ package ui {
 			whb = nativeW / nativeH;
 			thumbnailBmpContainer.addChild(thumbnailBmp);
 			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: thumbnailBmp, pageNum: pageNum}));
-			setTimeout(function ():void {
-				loadBigImg();
-			}, 1000);
+			loadBigImg();
 		}
 
 		private function loadBigImg():void {
 			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL);
 			bigImgLoader = new Loader();
-			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
+			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete1);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
 			bigImgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);
 			bigImgLoader.load(bigImgURLRequest);
@@ -72,9 +70,10 @@ package ui {
 			DisObjUtil.toParentCenter(loading);
 		}
 
-		private function onBigImgLoadComplete(e:Event):void {
+		private function onBigImgLoadComplete1(e:Event):void {
 			removeChild(loading);
 			bigImgBmp = e.target.content;
+			whb = bigImgBmp.width / bigImgBmp.height;//更新宽高比 理论上一样
 			bigImgBmpContainer.addChild(bigImgBmp);
 			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: bigImgBmp, pageNum: pageNum}));
 		}
@@ -88,10 +87,13 @@ package ui {
 		private function onBigImgLoadError(e:IOErrorEvent):void {
 			removeChild(loading);
 			trace("加载onBigImg IOError");
+			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadError"}));
 		}
 
 		private function onThumbnailImgIOError(e:IOErrorEvent):void {
 			trace("加载onThumbnailImg IOError");
+			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadError"}));
+			loadBigImg();
 		}
 
 		public function setSize(w:Number, h:Number):void {
@@ -104,6 +106,17 @@ package ui {
 		public function setPageAndPageInfo(pNum:int, pInfo:PageInfo):void {
 			pageNum = pNum;
 			pageInfo = pInfo;
+			if (pageInfo.bigImgBmp) {
+				trace("加载了缓存中的大图");
+				bigImgBmpContainer.addChild(pageInfo.bigImgBmp);
+				dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: pageInfo.bigImgBmp, pageNum: pageNum}));
+				return;
+			} else if (pageInfo.thumbnailImgBmp) {
+				trace("加载了缓存中的小图");
+				thumbnailBmpContainer.addChild(pageInfo.thumbnailImgBmp);
+				dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: pageInfo.thumbnailImgBmp, pageNum: pageNum}));
+				loadBigImg();
+			}
 			var thumbnailURLRequest:URLRequest = new URLRequest(pageInfo.thumbnailURL);
 			thumbnailLoader = new Loader();
 			thumbnailLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
@@ -112,14 +125,42 @@ package ui {
 		}
 
 		override public function destroy():void {
-			thumbnailLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
-			thumbnailLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
-			thumbnailLoader.unload();
-			thumbnailLoader = null;
-			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
-			bigImgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
-			bigImgLoader.unload();
-			bigImgLoader = null;
+			if (thumbnailLoader) {
+				thumbnailLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
+				thumbnailLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
+				try {
+					thumbnailLoader.close();
+				} catch (e:Error) {
+				}
+				thumbnailLoader.unload();
+				thumbnailLoader = null;
+			}
+			if (bigImgLoader) {
+				bigImgLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
+				bigImgLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
+				try {
+					bigImgLoader.close();
+				} catch (e:Error) {
+				}
+				bigImgLoader.unload();
+				bigImgLoader = null;
+			}
+			if (thumbnailBmp) {
+				thumbnailBmp = null;
+			}
+			if (bigImgBmp) {
+				bigImgBmp = null;
+			}
+			thumbnailBmpContainer = null;
+			bigImgBmpContainer = null;
+			pageInfo = null;
+			loading = null;
+		}
+
+		public function setTip(s:String):void {
+			var tf:TextField = new TextField();
+			tf.text = s;
+			addChild(tf);
 		}
 	}
 }

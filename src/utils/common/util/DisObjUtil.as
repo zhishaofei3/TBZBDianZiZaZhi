@@ -37,6 +37,18 @@ package utils.common.util {
 			diso.y = -rec.y - rec.height / 2 + diso.stage.stageHeight / 2;
 		}
 
+		public static function toStageXCenter(diso:DisplayObject):void {
+			diso.x = 0;
+			var rec:Rectangle = diso.getBounds(diso.stage);
+			diso.x = -rec.x - rec.width / 2 + diso.stage.stageWidth / 2;
+		}
+
+		public static function toStageYCenter(diso:DisplayObject):void {
+			diso.y = 0;
+			var rec:Rectangle = diso.getBounds(diso.stage);
+			diso.y = -rec.y - rec.height / 2 + diso.stage.stageHeight / 2;
+		}
+
 		public static function toParent0Point(diso:DisplayObject):void {
 			var rec:Rectangle = diso.getBounds(diso.parent);
 			diso.x -= rec.x + rec.width / 2;

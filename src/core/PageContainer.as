@@ -2,14 +2,12 @@ package core {
 	import data.ConfigManager;
 	import data.PageMode;
 	import data.infos.BookInfo;
-	import data.infos.PageInfo;
 
 	import events.UIEvent;
 
-	import flash.events.Event;
+	import flash.utils.Dictionary;
 
 	import ui.DoublePage;
-	import ui.Page;
 	import ui.SinglePage;
 
 	import utils.common.component.display.AbstractDisplayObject;
@@ -27,6 +25,7 @@ package core {
 		public static var BookHeight:int = 450;
 
 		public static var DEFAULT_HEIGHT:int = 600;
+
 		public static var stageW:int = 0;
 		public static var stageH:int = 0;
 
@@ -35,20 +34,14 @@ package core {
 
 		private var bookInfo:BookInfo;
 
-		private var currentPageNum:int;
+		public static var currentPageNum:int;
 
 		public function PageContainer() {
-			addEventListener(Event.ADDED_TO_STAGE, onStage);
-		}
-
-		private function onStage(e:Event):void {
-			stageW = stage.stageWidth;
-			stageH = stage.stageHeight;
 		}
 
 		public function initData(bInfo:BookInfo):void {
 			bookInfo = bInfo;
-			currentPageNum = 0;
+			currentPageNum = 1;
 			createPage();
 			this.x = (stage.stageWidth - BookWidth * 2) * 0.5;
 			this.y = (stage.stageHeight - BookHeight) * 0.5;
@@ -56,29 +49,48 @@ package core {
 			graphics.beginFill(0xFF0000);
 			graphics.drawRect(0, 0, 10, 10);
 			graphics.endFill();
+//			var info:PageInfo = new PageInfo("http://misimg.51tbzb.cn/PdfInfoFiles/thumbnail/248_363/2014-04-19/c47c619416e15f7c572fe148d643ae52.jpg?" + Math.random(), "http://misimg.51tbzb.cn/PdfInfoFiles/2014-04-19/3592_2014041916433200.jpg?" + Math.random());
+//			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, info, bookInfo.pageInfoList[currentPageNum + 1]);
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				singlePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1]);
+			} else {
+				doublePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1], bookInfo.pageInfoList[currentPageNum]);
+			}
 		}
 
 		private function createPage():void {
 			singlePage = new SinglePage();
 			singlePage.addEventListener(UIEvent.SINGLEPAGE_EVENT, onSingleEventHandler);
 			addChild(singlePage);
-//			singlePage.setPageInfo(pageInfo);
 			doublePage = new DoublePage();
 			doublePage.addEventListener(UIEvent.DOUBLEPAGE_EVENT, onDoubleEventHandler);
 			addChild(doublePage);
-//			var info:PageInfo = new PageInfo("http://misimg.51tbzb.cn/PdfInfoFiles/thumbnail/248_363/2014-04-19/c47c619416e15f7c572fe148d643ae52.jpg", "http://misimg.51tbzb.cn/PdfInfoFiles/2014-04-19/3592_2014041916433200.jpg");
-//			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, info, bookInfo.pageInfoList[currentPageNum + 1]);
-			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, bookInfo.pageInfoList[currentPageNum], bookInfo.pageInfoList[currentPageNum + 1]);
+		}
+
+		public function refrush():void {
+			singlePage.clear();
+			doublePage.clear();
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				singlePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1]);
+			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				if (currentPageNum != bookInfo.totalPageNum) {
+					trace("是双页");
+					doublePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1], bookInfo.pageInfoList[currentPageNum]);
+				} else {
+					trace("是最后的单页");
+					doublePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1]);
+				}
+			}
 		}
 
 		private function onSingleEventHandler(e:UIEvent):void {
 			switch (e.data.type) {
 				case "thumbnailImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum].thumbnailImgBmp = e.data.thumbnailBmp;//缓存
+					bookInfo.pageInfoList[e.data.pageNum - 1].thumbnailImgBmp = e.data.thumbnailBmp;//缓存
 					resize();
 					break;
 				case "bigImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum].bigImgBmp = e.data.bigImgBmp;
+					bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
 					resize();
 					break;
 			}
@@ -87,11 +99,11 @@ package core {
 		private function onDoubleEventHandler(e:UIEvent):void {
 			switch (e.data.type) {
 				case "thumbnailImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum].thumbnailImgBmp = e.data.thumbnailBmp;
+					bookInfo.pageInfoList[e.data.pageNum - 1].thumbnailImgBmp = e.data.thumbnailBmp;//缓存
 					resize();
 					break;
 				case "bigImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum].bigImgBmp = e.data.bigImgBmp;
+					bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
 					resize();
 					break;
 			}
@@ -134,8 +146,40 @@ package core {
 					}
 				}
 				doublePage.setSize(w, h);
-				DisObjUtil.toStageCenter(this);
+				this.x = (stageW - w) / 2;
+				DisObjUtil.toStageYCenter(this);
 			}
+		}
+
+		public function prev():void {
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				if (currentPageNum != 1) {
+					currentPageNum--;
+				}
+			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				if (currentPageNum > 2) {
+					currentPageNum -= 2;
+				}
+			}
+			dispatchEvent(new UIEvent(UIEvent.PAGECONTAINER_EVENT, {type: "page", page: PageContainer.currentPageNum}));
+			refrush();
+		}
+
+		public function next():void {
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				if (currentPageNum < bookInfo.totalPageNum) {
+					currentPageNum++;
+				}
+				dispatchEvent(new UIEvent(UIEvent.PAGECONTAINER_EVENT, {type: "page", page: PageContainer.currentPageNum}));
+			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				if ((currentPageNum + 2) <= bookInfo.totalPageNum) {
+					currentPageNum += 2;
+				} else {
+					return;
+				}
+			}
+			dispatchEvent(new UIEvent(UIEvent.PAGECONTAINER_EVENT, {type: "page", page: PageContainer.currentPageNum}));
+			refrush();
 		}
 	}
 }

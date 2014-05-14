@@ -12,6 +12,8 @@ package events {
 		public static var PAGE_EVENT:String = "PAGE_EVENT";
 		public static var SINGLEPAGE_EVENT:String = "SINGLEPAGE_EVENT";
 		public static var DOUBLEPAGE_EVENT:String = "DOUBLEPAGE_EVENT";
+		public static var TOOLBARMANAGER_EVENT:String = "TOOLBARMANAGER_EVENT";
+		public static var PAGECONTAINER_EVENT:String = "PAGECONTAINER_EVENT";
 		public function UIEvent(t:String, _data:Object = null, bubbles:Boolean = false, cancelable:Boolean = false) {
 			super(t, bubbles, cancelable);
 			this.data = _data;
