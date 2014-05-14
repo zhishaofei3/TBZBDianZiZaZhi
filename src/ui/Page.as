@@ -80,7 +80,9 @@ package ui {
 		}
 
 		private function onBigImgLoadProgress(e:ProgressEvent):void {
-			
+			var jd:String = (e.bytesLoaded / e.bytesTotal * 100).toFixed(1);
+			loading.loadingBar.width = int(jd);
+			loading.pText.text = jd + "%";
 		}
 
 		private function onBigImgLoadError(e:IOErrorEvent):void {

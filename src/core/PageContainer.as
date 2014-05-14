@@ -2,12 +2,14 @@ package core {
 	import data.ConfigManager;
 	import data.PageMode;
 	import data.infos.BookInfo;
+	import data.infos.PageInfo;
 
 	import events.UIEvent;
 
 	import flash.events.Event;
 
 	import ui.DoublePage;
+	import ui.Page;
 	import ui.SinglePage;
 
 	import utils.common.component.display.AbstractDisplayObject;
@@ -64,6 +66,8 @@ package core {
 			doublePage = new DoublePage();
 			doublePage.addEventListener(UIEvent.DOUBLEPAGE_EVENT, onDoubleEventHandler);
 			addChild(doublePage);
+//			var info:PageInfo = new PageInfo("http://misimg.51tbzb.cn/PdfInfoFiles/thumbnail/248_363/2014-04-19/c47c619416e15f7c572fe148d643ae52.jpg", "http://misimg.51tbzb.cn/PdfInfoFiles/2014-04-19/3592_2014041916433200.jpg");
+//			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, info, bookInfo.pageInfoList[currentPageNum + 1]);
 			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, bookInfo.pageInfoList[currentPageNum], bookInfo.pageInfoList[currentPageNum + 1]);
 		}
 
