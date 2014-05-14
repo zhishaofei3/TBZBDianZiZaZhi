@@ -62,5 +62,11 @@ package ui {
 				page = null;
 			}
 		}
+
+		public function resize():void {
+			if(page){
+				page.resize();
+			}
+		}
 	}
 }

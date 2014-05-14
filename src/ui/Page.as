@@ -65,7 +65,7 @@ package ui {
 		private function loadBigImg():void {
 			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL);
 			bigImgLoader = new Loader();
-			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete1);
+			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
 			bigImgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);
 			bigImgLoader.load(bigImgURLRequest);
@@ -73,7 +73,7 @@ package ui {
 			DisObjUtil.toParentCenter(loading);
 		}
 
-		private function onBigImgLoadComplete1(e:Event):void {
+		private function onBigImgLoadComplete(e:Event):void {
 			removeChild(loading);
 			bigImgBmp = e.target.content;
 			bigImgBmp.smoothing = true;
@@ -129,6 +129,7 @@ package ui {
 			thumbnailBmpContainer.height = h;
 			bigImgBmpContainer.width = w;
 			bigImgBmpContainer.height = h;
+
 		}
 
 		public function setPageAndPageInfo(pNum:int, pInfo:PageInfo):void {
@@ -164,8 +165,9 @@ package ui {
 				thumbnailLoader = null;
 			}
 			if (bigImgLoader) {
-				bigImgLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
-				bigImgLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
+				bigImgLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onBigImgLoadComplete);
+				bigImgLoader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
+				bigImgLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);
 				try {
 					bigImgLoader.close();
 				} catch (e:Error) {
@@ -189,6 +191,10 @@ package ui {
 			var tf:TextField = new TextField();
 			tf.text = s;
 			addChild(tf);
+		}
+
+		public function resize():void {
+			DisObjUtil.toParentCenter(loading);
 		}
 	}
 }

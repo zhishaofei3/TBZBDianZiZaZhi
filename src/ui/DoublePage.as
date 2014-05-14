@@ -27,7 +27,6 @@ package ui {
 			if (doublePage2) {
 				doublePage2.setSize(w / 2, h);
 				doublePage2.x = doublePage1.x + doublePage1.width;
-				trace(doublePage2.x);
 			}
 		}
 
@@ -84,6 +83,15 @@ package ui {
 				doublePage2.destroy();
 				removeChild(doublePage2);
 				doublePage2 = null;
+			}
+		}
+
+		public function resize():void {
+			if (doublePage1) {
+				doublePage1.resize();
+			}
+			if (doublePage2) {
+				doublePage2.resize();
 			}
 		}
 	}
