@@ -19,8 +19,9 @@ package core {
 
 		public function ToolBarManager() {
 			toolBar = new UI_ToolBar();
-			toolBar.alpha = 0.5;
+			toolBar.alpha = 0.8;
 			LayerManager.toolContainer.addChild(toolBar);
+			toolBar.logo.addEventListener(MouseEvent.CLICK, onClickLogoBtnHandler);
 			toolBar.single_btn.addEventListener(MouseEvent.CLICK, onClickSingleBtnHandler);
 			toolBar.double_btn.addEventListener(MouseEvent.CLICK, onClickDoubleBtnHandler);
 			toolBar.zoomIn_btn.addEventListener(MouseEvent.CLICK, onClickZoomInBtnHandler);
@@ -39,6 +40,10 @@ package core {
 
 		public function setCurrentPage(p:int):void {
 			toolBar.pageInput_mc.pageInput_txt.text = String(p);
+		}
+
+		private function onClickLogoBtnHandler(e:MouseEvent):void {
+			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "logo"}));
 		}
 
 		private function onClickSingleBtnHandler(e:MouseEvent):void {
@@ -76,6 +81,10 @@ package core {
 			toolBar.big_next_btn.x = PageContainer.stageW - 20 - toolBar.big_next_btn.width;
 			DisObjUtil.toStageYCenter(toolBar.big_next_btn);
 			DisObjUtil.toStageYCenter(toolBar.big_prev_btn);
+		}
+
+		public function setBookName(s:String):void {
+			toolBar.bookName.text = s;
 		}
 	}
 }

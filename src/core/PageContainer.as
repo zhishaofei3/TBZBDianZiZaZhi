@@ -1,11 +1,12 @@
 package core {
+	import com.greensock.TweenLite;
+
 	import data.ConfigManager;
 	import data.PageMode;
 	import data.infos.BookInfo;
+	import data.infos.PageInfo;
 
 	import events.UIEvent;
-
-	import flash.utils.Dictionary;
 
 	import ui.DoublePage;
 	import ui.SinglePage;
@@ -49,12 +50,12 @@ package core {
 			graphics.beginFill(0xFF0000);
 			graphics.drawRect(0, 0, 10, 10);
 			graphics.endFill();
-//			var info:PageInfo = new PageInfo("http://misimg.51tbzb.cn/PdfInfoFiles/thumbnail/248_363/2014-04-19/c47c619416e15f7c572fe148d643ae52.jpg?" + Math.random(), "http://misimg.51tbzb.cn/PdfInfoFiles/2014-04-19/3592_2014041916433200.jpg?" + Math.random());
+			var info:PageInfo = new PageInfo("http://misimg.51tbzb.cn/PdfInfoFiles/thumbnail/248_363/2014-04-19/c47c619416e15f7c572fe148d643ae52.jpg?" + Math.random(), "http://misimg.51tbzb.cn/PdfInfoFiles/2014-04-19/3592_2014041916433200.jpg?" + Math.random());
 //			doublePage.setPageAndPageInfo(currentPageNum, currentPageNum + 1, info, bookInfo.pageInfoList[currentPageNum + 1]);
 			if (ConfigManager.pageMode == PageMode.SINGLE) {
 				singlePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1]);
 			} else {
-				doublePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1], bookInfo.pageInfoList[currentPageNum]);
+				doublePage.setPageAndPageInfo(currentPageNum, info, bookInfo.pageInfoList[currentPageNum]);
 			}
 		}
 
@@ -180,6 +181,12 @@ package core {
 			}
 			dispatchEvent(new UIEvent(UIEvent.PAGECONTAINER_EVENT, {type: "page", page: PageContainer.currentPageNum}));
 			refrush();
+		}
+
+		public function zoomIt():void {
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				TweenLite.to(singlePage, 1, {scaleX: 1.5, scaleY: 1.5});
+			}
 		}
 	}
 }

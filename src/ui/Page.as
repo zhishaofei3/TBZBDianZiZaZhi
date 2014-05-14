@@ -11,11 +11,13 @@ package ui {
 	import events.UIEvent;
 
 	import flash.display.Bitmap;
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
+	import flash.geom.ColorTransform;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
 
@@ -51,6 +53,7 @@ package ui {
 
 		private function onThumbnailImgLoadComplete(e:Event):void {
 			thumbnailBmp = e.target.content;
+			thumbnailBmp.smoothing = true;
 			nativeW = thumbnailBmp.width;
 			nativeH = thumbnailBmp.height;
 			whb = nativeW / nativeH;
@@ -73,6 +76,7 @@ package ui {
 		private function onBigImgLoadComplete1(e:Event):void {
 			removeChild(loading);
 			bigImgBmp = e.target.content;
+			bigImgBmp.smoothing = true;
 			whb = bigImgBmp.width / bigImgBmp.height;//更新宽高比 理论上一样
 			bigImgBmpContainer.addChild(bigImgBmp);
 			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: bigImgBmp, pageNum: pageNum}));
@@ -82,6 +86,30 @@ package ui {
 			var jd:String = (e.bytesLoaded / e.bytesTotal * 100).toFixed(1);
 			loading.loadingBar.width = int(jd);
 			loading.pText.text = jd + "%";
+//			setBrightness(thumbnailBmpContainer, -(1 - int(jd) * 0.01));//从黑暗中变明亮
+		}
+
+		public function setBrightness(obj:DisplayObject, value:Number):void {
+			var colorTransformer:ColorTransform = obj.transform.colorTransform;
+			var backup_filters:Array = obj.filters;
+			if (value >= 0) {
+				colorTransformer.blueMultiplier = 1 - value;
+				colorTransformer.redMultiplier = 1 - value;
+				colorTransformer.greenMultiplier = 1 - value;
+				colorTransformer.redOffset = 255 * value;
+				colorTransformer.greenOffset = 255 * value;
+				colorTransformer.blueOffset = 255 * value;
+			} else {
+				value = Math.abs(value);
+				colorTransformer.blueMultiplier = 1 - value;
+				colorTransformer.redMultiplier = 1 - value;
+				colorTransformer.greenMultiplier = 1 - value;
+				colorTransformer.redOffset = 0;
+				colorTransformer.greenOffset = 0;
+				colorTransformer.blueOffset = 0;
+			}
+			obj.transform.colorTransform = colorTransformer;
+			obj.filters = backup_filters;
 		}
 
 		private function onBigImgLoadError(e:IOErrorEvent):void {

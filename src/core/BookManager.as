@@ -55,6 +55,7 @@ package core {
 		public static function setBookConfig(bInfo:BookInfo):void {
 			bookInfo = bInfo;
 			toolBarManager.setTotalPage(bInfo.totalPageNum);
+			toolBarManager.setBookName(bInfo.gradeName + "(" + bInfo.version + ")" + " " + bInfo.year + "年 第" + bInfo.perNum + "期");
 			pageContainer.initData(bInfo);
 			toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 		}
@@ -89,6 +90,9 @@ package core {
 					break;
 				case "next":
 					pageContainer.next();
+					break;
+				case "logo":
+					pageContainer.zoomIt();
 					break;
 				case "close":
 					break;
