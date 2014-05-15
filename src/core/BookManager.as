@@ -82,8 +82,10 @@ package core {
 					pageContainer.refrush();
 					break;
 				case "zoomIn":
+					pageContainer.zoomIn();
 					break;
 				case "zoomOut":
+					pageContainer.zoomOut();
 					break;
 				case "prev":
 					pageContainer.prev();
@@ -92,7 +94,7 @@ package core {
 					pageContainer.next();
 					break;
 				case "logo":
-					pageContainer.zoomIt();
+					pageContainer.resize();
 					break;
 				case "close":
 					break;

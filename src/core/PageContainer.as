@@ -1,6 +1,4 @@
 package core {
-	import com.greensock.TweenLite;
-
 	import data.ConfigManager;
 	import data.PageMode;
 	import data.infos.BookInfo;
@@ -182,10 +180,14 @@ package core {
 			refrush();
 		}
 
-		public function zoomIt():void {
+		public function zoomIn():void {
 			if (ConfigManager.pageMode == PageMode.SINGLE) {
-				TweenLite.to(singlePage, 1, {transformAroundCenter: {scaleX: 1.5, scaleY: 1.5}});
+				singlePage.zoomIn();
 			}
+		}
+
+		public function zoomOut():void {
+
 		}
 	}
 }

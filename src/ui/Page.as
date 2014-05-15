@@ -129,7 +129,6 @@ package ui {
 			thumbnailBmpContainer.height = h;
 			bigImgBmpContainer.width = w;
 			bigImgBmpContainer.height = h;
-
 		}
 
 		public function setPageAndPageInfo(pNum:int, pInfo:PageInfo):void {
