@@ -187,7 +187,9 @@ package core {
 		}
 
 		public function zoomOut():void {
-
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				singlePage.zoomOut();
+			}
 		}
 	}
 }

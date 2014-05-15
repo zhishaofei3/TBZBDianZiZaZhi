@@ -11,6 +11,7 @@ package ui {
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.getTimer;
 
 	import utils.common.component.display.AbstractDisplayObject;
 
@@ -20,8 +21,11 @@ package ui {
 		private var page:Page;
 
 		private var myZoomMode:String;
-
 		private var isZooming:Boolean;
+
+		private var offsetX:Number;
+		private var offsetY:Number;
+		private var preDownTime:int;
 
 		public function SinglePage() {
 			initBg();
@@ -46,9 +50,36 @@ package ui {
 		private function createPage():void {
 			page = new Page();
 			page.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
-			page.addEventListener(MouseEvent.CLICK, onZoomHandler);
+			page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 			addChild(page);
 			myZoomMode = ZoomMode.SC_NORMAL;
+		}
+
+		private function onMouseDownHandler(e:MouseEvent):void {
+			preDownTime = getTimer();
+			offsetX = e.stageX - page.x;
+			offsetY = e.stageY - page.y;
+			page.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveHandler);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+		}
+
+		private function onMouseUpHandler(e:MouseEvent):void {
+			page.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveHandler);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+			var nowTime:int = getTimer();
+			if (nowTime - preDownTime < 200) {
+				onZoomHandler(e);
+			} else {
+				if (page.width < stage.stageWidth) {//暂时测试
+					toCenter(page);
+				}
+			}
+		}
+
+		private function onMouseMoveHandler(e:MouseEvent):void {
+			page.x = e.stageX - offsetX;
+			page.y = e.stageY - offsetY;
+			e.updateAfterEvent();
 		}
 
 		private function onZoomHandler(e:MouseEvent):void {
@@ -56,44 +87,105 @@ package ui {
 				return;
 			}
 			if (myZoomMode == ZoomMode.SC_NORMAL) {
-				scaleAtPoint(page, new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
+				zoomAtPoint(page, new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));//放大至1.8倍
+				myZoomMode = ZoomMode.SC_1_5;
+				trace("自定义位置的放大 放大1.8倍");
 			} else {
-				isZooming = true;
-				TweenMax.to(page, 0.5, {scaleX: 1, scaleY: 1, x: 0, y: 0, onComplete: function ():void {
-					isZooming = false;
-					myZoomMode = ZoomMode.SC_NORMAL;
-				}});
+				myZoomMode = ZoomMode.SC_NORMAL;
+				var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+				trace(stageCenterPoint);
+				trace(page.globalToLocal(stageCenterPoint));
+				zoomAtPoint(page, this.globalToLocal(stageCenterPoint), "1");//还原1
+				trace("恢复");
 			}
 		}
 
-		private function scaleAtPoint(target:DisplayObject, point:Point):void {
+		private function toCenter(target:DisplayObject):void {
+			TweenMax.killTweensOf(target);
+			var oldX:Number = target.x;
+			target.x = 0;
+			var rec:Rectangle = target.getBounds(target.stage);
+			var xx:Number = -rec.x - rec.width / 2 + target.stage.stageWidth / 2;
+			target.x = oldX;
+			isZooming = true;
+			trace("isZooming = true 1");
+			TweenMax.to(target, 0.3, {x: xx, onComplete: function ():void {
+				isZooming = false;
+				trace("结束");
+				trace("isZooming = false 1");
+			}});
+		}
+
+		private function zoomAtPoint(target:DisplayObject, point:Point, sc:Object = null):void {
+			var scale:Number;
+			if (sc is String) {
+				scale = Number(sc);
+			} else if (sc is Number) {
+				scale = target.scaleX + sc;
+			} else {
+				scale = 1.8;
+			}
+			if (scale < 1) {
+				scale = 1;
+				trace("缩放的比1小，所以还原了");
+			} else if (scale > 3) {
+				scale = 3;
+				trace("最多只能放大3倍")
+			}
 			TweenMax.killTweensOf(target);
 			var bfsx:Number = target.scaleX;
 			var bfsy:Number = target.scaleY;
 			var stagePoint:Point = target.localToGlobal(point);
-			var scale:Number = 1.8;
 			target.scaleX = scale;
 			target.scaleY = scale;
 			var currentStagePoint:Point = target.localToGlobal(point);
 			var yy:Number = target.y - (currentStagePoint.y - stagePoint.y);
+			//备份
+			var oldX:Number = target.x;
 			target.x = 0;
 			var rec:Rectangle = target.getBounds(target.stage);
 			var xx:Number = -rec.x - rec.width / 2 + target.stage.stageWidth / 2;
+			target.x = oldX;
+			if (scale == 1) {//对准y
+				var oldY:Number = target.y;
+				target.y = 0;
+				var rec2:Rectangle = target.getBounds(target.stage);
+				yy = -rec2.y - rec2.height / 2 + target.stage.stageHeight / 2;
+				target.y = oldY;
+			}
+
 			target.scaleX = bfsx;
 			target.scaleY = bfsy;
 			isZooming = true;
-			TweenMax.to(target, 0.5, {scaleX: scale, scaleY: scale, x: xx, y: yy, onComplete: function ():void {
+			trace("isZooming = true 2");
+			TweenMax.to(target, 0.3, {scaleX: scale, scaleY: scale, x: xx, y: yy, onComplete: function ():void {
 				isZooming = false;
-				myZoomMode = ZoomMode.SC_1_5;
+				trace("isZooming = false 2");
 			}});
 		}
 
 		public function zoomIn():void {
-
+			if (isZooming) {
+				return;
+			}
+			trace("缩放增加0.5");
+			var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+			trace(stageCenterPoint);
+			trace(page.globalToLocal(stageCenterPoint));
+			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), 0.5);//缩放增加0.5
+			myZoomMode = ZoomMode.SC_MORE;
 		}
 
 		public function zoomOut():void {
-
+			if (isZooming) {
+				return;
+			}
+			trace("缩放减少0.5");
+			var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+			trace(stageCenterPoint);
+			trace(page.globalToLocal(stageCenterPoint));
+			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), -0.5);//缩放减少0.5
+			myZoomMode = ZoomMode.SC_MORE;
 		}
 
 		private function onPageEventHandler(e:UIEvent):void {
