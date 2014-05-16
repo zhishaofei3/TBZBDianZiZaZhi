@@ -20,7 +20,7 @@ package ui {
 		private var pageInfo:PageInfo;
 		private var page:Page;
 
-		private var myZoomMode:String;
+		private var _myZoomMode:String;
 		private var isZooming:Boolean;
 
 		private var offsetX:Number;
@@ -52,7 +52,7 @@ package ui {
 			page.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
 			page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 			addChild(page);
-			myZoomMode = ZoomMode.SC_NORMAL;
+			_myZoomMode = ZoomMode.SC_NORMAL;
 		}
 
 		private function onMouseDownHandler(e:MouseEvent):void {
@@ -77,21 +77,23 @@ package ui {
 		}
 
 		private function onMouseMoveHandler(e:MouseEvent):void {
-			page.x = e.stageX - offsetX;
-			page.y = e.stageY - offsetY;
-			e.updateAfterEvent();
+			if (_myZoomMode != ZoomMode.SC_NORMAL) {
+				page.x = e.stageX - offsetX;
+				page.y = e.stageY - offsetY;
+				e.updateAfterEvent();
+			}
 		}
 
 		private function onZoomHandler(e:MouseEvent):void {
 			if (isZooming) {
 				return;
 			}
-			if (myZoomMode == ZoomMode.SC_NORMAL) {
+			if (_myZoomMode == ZoomMode.SC_NORMAL) {
 				zoomAtPoint(page, new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));//放大至1.8倍
-				myZoomMode = ZoomMode.SC_1_5;
+				_myZoomMode = ZoomMode.SC_1_5;
 				trace("自定义位置的放大 放大1.8倍");
 			} else {
-				myZoomMode = ZoomMode.SC_NORMAL;
+				_myZoomMode = ZoomMode.SC_NORMAL;
 				var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
 				trace(stageCenterPoint);
 				trace(page.globalToLocal(stageCenterPoint));
@@ -100,16 +102,16 @@ package ui {
 			}
 		}
 
-		private function toCenter(target:DisplayObject):void {
-			TweenMax.killTweensOf(target);
-			var oldX:Number = target.x;
-			target.x = 0;
-			var rec:Rectangle = target.getBounds(target.stage);
-			var xx:Number = -rec.x - rec.width / 2 + target.stage.stageWidth / 2;
-			target.x = oldX;
+		private function toCenter(diso:DisplayObject):void {
+			TweenMax.killTweensOf(diso);
+			var oldX:Number = diso.x;
+			diso.x = 0;
+			var rec:Rectangle = diso.getBounds(diso.stage);
+			var xx:Number = -rec.x - rec.width / 2 + diso.stage.stageWidth / 2;
+			diso.x = oldX;
 			isZooming = true;
 			trace("isZooming = true 1");
-			TweenMax.to(target, 0.3, {x: xx, onComplete: function ():void {
+			TweenMax.to(diso, 0.3, {x: xx, onComplete: function ():void {
 				isZooming = false;
 				trace("结束");
 				trace("isZooming = false 1");
@@ -153,7 +155,6 @@ package ui {
 				yy = -rec2.y - rec2.height / 2 + target.stage.stageHeight / 2;
 				target.y = oldY;
 			}
-
 			target.scaleX = bfsx;
 			target.scaleY = bfsy;
 			isZooming = true;
@@ -173,7 +174,7 @@ package ui {
 			trace(stageCenterPoint);
 			trace(page.globalToLocal(stageCenterPoint));
 			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), 0.5);//缩放增加0.5
-			myZoomMode = ZoomMode.SC_MORE;
+			_myZoomMode = ZoomMode.SC_MORE;
 		}
 
 		public function zoomOut():void {
@@ -185,7 +186,7 @@ package ui {
 			trace(stageCenterPoint);
 			trace(page.globalToLocal(stageCenterPoint));
 			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), -0.5);//缩放减少0.5
-			myZoomMode = ZoomMode.SC_MORE;
+			_myZoomMode = ZoomMode.SC_MORE;
 		}
 
 		private function onPageEventHandler(e:UIEvent):void {
@@ -207,7 +208,11 @@ package ui {
 
 		public function clear():void {
 			if (page) {
+				TweenMax.killTweensOf(page);
 				page.removeEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+				page.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
+				page.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveHandler);
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				page.destroy();
 				removeChild(page);
 				page = null;
@@ -218,6 +223,10 @@ package ui {
 			if (page) {
 				page.resize();
 			}
+		}
+
+		public function get myZoomMode():String {
+			return _myZoomMode;
 		}
 	}
 }

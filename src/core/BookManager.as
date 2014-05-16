@@ -7,6 +7,8 @@ package core {
 	import events.UIEvent;
 
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 
 	import scenes.LayerManager;
 
@@ -42,6 +44,20 @@ package core {
 			pageContainer = new PageContainer();
 			pageContainer.addEventListener(UIEvent.PAGECONTAINER_EVENT, onPageContainerEvent);
 			LayerManager.bookContainer.addChild(pageContainer);
+			TBZBMain.st.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDownHandler);
+		}
+
+		private static function onKeyDownHandler(e:KeyboardEvent):void {
+			switch (e.keyCode) {
+				case Keyboard.LEFT:
+					pageContainer.prev();
+					break;
+				case Keyboard.RIGHT:
+					pageContainer.next();
+					break;
+				default :
+					break;
+			}
 		}
 
 		private static function onPageContainerEvent(e:UIEvent):void {
@@ -97,6 +113,17 @@ package core {
 					pageContainer.resize();
 					break;
 				case "close":
+					break;
+				case "page":
+					var p:int = e.data.data;
+					if (p % 2 == 0) {//偶数页先变成 单数页
+						p--;
+					}
+					PageContainer.currentPageNum = p;
+					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+					pageContainer.refrush();
+					break;
+				default:
 					break;
 			}
 		}

@@ -63,7 +63,7 @@ package ui {
 		}
 
 		private function loadBigImg():void {
-			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL);
+			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL + "?" + Math.random());
 			bigImgLoader = new Loader();
 			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
@@ -74,7 +74,9 @@ package ui {
 		}
 
 		private function onBigImgLoadComplete(e:Event):void {
-			removeChild(loading);
+			if (contains(loading)) {
+				removeChild(loading);
+			}
 			bigImgBmp = e.target.content;
 			bigImgBmp.smoothing = true;
 			whb = bigImgBmp.width / bigImgBmp.height;//更新宽高比 理论上一样

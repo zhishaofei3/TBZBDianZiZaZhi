@@ -1,6 +1,7 @@
 package core {
 	import data.ConfigManager;
 	import data.PageMode;
+	import data.ZoomMode;
 	import data.infos.BookInfo;
 
 	import events.UIEvent;
@@ -184,11 +185,17 @@ package core {
 			if (ConfigManager.pageMode == PageMode.SINGLE) {
 				singlePage.zoomIn();
 			}
+			if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				doublePage.zoomIn();
+			}
 		}
 
 		public function zoomOut():void {
 			if (ConfigManager.pageMode == PageMode.SINGLE) {
 				singlePage.zoomOut();
+			}
+			if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				doublePage.zoomOut();
 			}
 		}
 	}
