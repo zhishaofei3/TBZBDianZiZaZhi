@@ -1,5 +1,7 @@
 package scenes {
 
+	import core.PageContainer;
+
 	import utils.common.util.DisObjUtil;
 
 	import flash.display.DisplayObjectContainer;
@@ -29,7 +31,7 @@ package scenes {
 			bgContainer.mouseEnabled = false;
 			bgContainer.mouseChildren = false;
 			bgContainer.graphics.beginFill(0xE8E8E8);
-			bgContainer.graphics.drawRect(0, 0, TBZBMain.st.stageWidth, TBZBMain.st.stageHeight);
+			bgContainer.graphics.drawRect(0, 0, PageContainer.stageW, PageContainer.stageH);
 			bgContainer.graphics.endFill();
 			cont.addChild(bgContainer);
 			bookContainer = new Sprite();

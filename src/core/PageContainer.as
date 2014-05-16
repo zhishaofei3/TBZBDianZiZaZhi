@@ -1,7 +1,6 @@
 package core {
 	import data.ConfigManager;
 	import data.PageMode;
-	import data.ZoomMode;
 	import data.infos.BookInfo;
 
 	import events.UIEvent;
@@ -124,7 +123,9 @@ package core {
 						w = h * 0.7;
 					}
 				}
-				singlePage.setSize(w, h);
+				if (singlePage) {
+					singlePage.setSize(w, h);
+				}
 				DisObjUtil.toStageCenter(this);
 			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
 				if (stageW > stageH) {
@@ -142,12 +143,18 @@ package core {
 						w = h * 1.4;
 					}
 				}
-				doublePage.setSize(w, h);
+				if (doublePage) {
+					doublePage.setSize(w, h);
+				}
 				this.x = (stageW - w) / 2;
 				DisObjUtil.toStageYCenter(this);
 			}
-			singlePage.resize();
-			doublePage.resize();
+			if (singlePage) {
+				singlePage.resize();
+			}
+			if (doublePage) {
+				doublePage.resize();
+			}
 		}
 
 		public function prev():void {

@@ -19,6 +19,10 @@ package ui {
 	import flash.events.ProgressEvent;
 	import flash.geom.ColorTransform;
 	import flash.net.URLRequest;
+	import flash.system.ApplicationDomain;
+	import flash.system.LoaderContext;
+	import flash.system.Security;
+	import flash.system.SecurityDomain;
 	import flash.text.TextField;
 
 	import utils.common.component.display.AbstractDisplayObject;
@@ -67,14 +71,22 @@ package ui {
 			bigImgLoader = new Loader();
 			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
+			trace("我增加了PROGRESS 我是" + pageNum);
 			bigImgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);
-			bigImgLoader.load(bigImgURLRequest);
+			if (Security.sandboxType == Security.LOCAL_TRUSTED) {
+				bigImgLoader.load(bigImgURLRequest);
+			} else {
+				var context:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, SecurityDomain.currentDomain);
+				bigImgLoader.load(bigImgURLRequest, context);
+			}
 			addChild(loading);
+			trace(thumbnailBmpContainer.width);
+			trace(thumbnailBmpContainer.height);
 			DisObjUtil.toParentCenter(loading);
 		}
 
 		private function onBigImgLoadComplete(e:Event):void {
-			if (contains(loading)) {
+			if (this.contains(loading)) {
 				removeChild(loading);
 			}
 			bigImgBmp = e.target.content;
@@ -86,6 +98,7 @@ package ui {
 
 		private function onBigImgLoadProgress(e:ProgressEvent):void {
 			var jd:String = (e.bytesLoaded / e.bytesTotal * 100).toFixed(1);
+			trace("我是 " + pageNum + "我的进度 " + jd);
 			loading.loadingBar.width = int(jd);
 			loading.pText.text = jd + "%";
 //			setBrightness(thumbnailBmpContainer, -(1 - int(jd) * 0.01));//从黑暗中变明亮
@@ -146,12 +159,18 @@ package ui {
 				thumbnailBmpContainer.addChild(pageInfo.thumbnailImgBmp);
 				dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: pageInfo.thumbnailImgBmp, pageNum: pageNum}));
 				loadBigImg();
+				return;
 			}
 			var thumbnailURLRequest:URLRequest = new URLRequest(pageInfo.thumbnailURL);
 			thumbnailLoader = new Loader();
 			thumbnailLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onThumbnailImgLoadComplete);
 			thumbnailLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onThumbnailImgIOError);
-			thumbnailLoader.load(thumbnailURLRequest);
+			if (Security.sandboxType == Security.LOCAL_TRUSTED) {
+				thumbnailLoader.load(thumbnailURLRequest);
+			} else {
+				var context:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, SecurityDomain.currentDomain);
+				thumbnailLoader.load(thumbnailURLRequest, context);
+			}
 		}
 
 		override public function destroy():void {
@@ -166,6 +185,7 @@ package ui {
 				thumbnailLoader = null;
 			}
 			if (bigImgLoader) {
+				trace("我移除了PROGRESS 我是" + pageNum);
 				bigImgLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onBigImgLoadComplete);
 				bigImgLoader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
 				bigImgLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);

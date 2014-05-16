@@ -32,6 +32,7 @@ package {
 		private function init(e:Event):void {
 			PageContainer.stageW = stage.stageWidth;
 			PageContainer.stageH = stage.stageHeight;
+			trace(PageContainer.stageW, PageContainer.stageH);
 			TBZBMain.st = stage;
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -49,6 +50,7 @@ package {
 			ConfigManager.init();
 			BookManager.init();
 			ConfigManager.loadBookData();
+			BookManager.onResizeHandler(null);
 		}
 	}
 }

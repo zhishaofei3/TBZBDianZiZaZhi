@@ -25,7 +25,7 @@ package core {
 			TBZBMain.st.addEventListener(Event.RESIZE, onResizeHandler);
 		}
 
-		private static function onResizeHandler(e:Event):void {
+		public static function onResizeHandler(e:Event):void {
 			PageContainer.stageW = TBZBMain.st.stageWidth;
 			PageContainer.stageH = TBZBMain.st.stageHeight;
 			pageContainer.resize();

@@ -38,8 +38,8 @@ package data {
 
 		public static function loadBookData():void {
 			var loadUtil:LoadUtil = new LoadUtil();
-//			loadUtil.load("loadBookData", "http://new.51tbzb.cn/testJson.php", null, URLRequestMethod.POST, "data");
-			loadUtil.load("loadBookData", "http://new.51tbzb.cn/tbzbv1/index?action=getContent&id=1109&device=IPad", null, URLRequestMethod.POST, "data");
+			loadUtil.load("loadBookData", "http://new.51tbzb.cn/testJson.php", null, URLRequestMethod.POST, "data");
+//			loadUtil.load("loadBookData", "http://new.51tbzb.cn/tbzbv1/index?action=getContent&id=1109&device=IPad", null, URLRequestMethod.POST, "data");
 			loadUtil.addEventListener("loadBookData", onLoadBookDataComplete);
 		}
 

@@ -1,6 +1,8 @@
 package ui {
 	import com.greensock.TweenMax;
 
+	import core.PageContainer;
+
 	import data.ZoomMode;
 	import data.infos.PageInfo;
 
@@ -219,7 +221,17 @@ package ui {
 				return;
 			}
 			trace("缩放增加0.5");
-			var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+			if (!page) {
+				page = doublePage1;
+				doublePage1.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
+				doublePage2.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
+				doublePage1.visible = doublePage2.visible = false;
+				trace("我隐藏了它");
+				page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
+				page.visible = true;
+				addChild(page);
+			}
+			var stageCenterPoint:Point = new Point(PageContainer.stageW / 2, PageContainer.stageH / 2);
 			trace(stageCenterPoint);
 			trace(page.globalToLocal(stageCenterPoint));
 			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), 0.5);//缩放增加0.5
