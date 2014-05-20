@@ -62,8 +62,22 @@ package ui {
 			page = new Page();
 			page.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
 			page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
+			page.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			page.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			addChild(page);
 			myZoomMode = ZoomMode.SC_NORMAL;
+		}
+
+		private function onMouseOutIcoHandler(e:MouseEvent):void {
+			MouseIco.delMouseIco();
+		}
+
+		private function onMouseOverIcoHandler(e:MouseEvent):void {
+			if (myZoomMode == ZoomMode.SC_NORMAL) {
+				MouseIco.addMouseIco(new UI_ZoomIn());
+			} else {
+				MouseIco.addMouseIco(new UI_ZoomOut());
+			}
 		}
 
 		private function onMouseDownHandler(e:MouseEvent):void {
@@ -228,6 +242,8 @@ package ui {
 				page.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 				page.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveHandler);
 				stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
+				page.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
+				page.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 				page.destroy();
 				removeChild(page);
 				page = null;
@@ -260,7 +276,7 @@ package ui {
 		}
 
 		public function reset():void {
-			if(page){
+			if (page) {
 				page.scaleX = 1;
 				page.scaleY = 1;
 				page.x = 0;

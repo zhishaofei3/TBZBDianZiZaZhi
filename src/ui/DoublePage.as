@@ -83,15 +83,31 @@ package ui {
 			doublePage1 = new Page();
 			doublePage1.name = "doublePage1";
 			doublePage1.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+			doublePage1.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			doublePage1.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			doublePage1.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			addChild(doublePage1);
 			doublePage2 = new Page();
 			doublePage2.name = "doublePage2";
 			doublePage2.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+			doublePage2.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			doublePage2.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			doublePage2.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			addChild(doublePage2);
 			addChild(centerLine);
 			myZoomMode = ZoomMode.SC_NORMAL;
+		}
+
+		private function onMouseOutIcoHandler(e:MouseEvent):void {
+			MouseIco.delMouseIco();
+		}
+
+		private function onMouseOverIcoHandler(e:MouseEvent):void {
+			if (myZoomMode == ZoomMode.SC_NORMAL) {
+				MouseIco.addMouseIco(new UI_ZoomIn());
+			} else {
+				MouseIco.addMouseIco(new UI_ZoomOut());
+			}
 		}
 
 		public function huanyuan():void {
@@ -140,7 +156,7 @@ package ui {
 			var nowTime:int = getTimer();
 			var offsetXEnd:Number = e.stageX - page.x;
 			var offsetYEnd:Number = e.stageY - page.y;
-			if (nowTime - preDownTime < 200 && (offsetXEnd - offsetX > 50 && offsetYEnd - offsetY < 50)) {
+			if ((nowTime - preDownTime < 200) && (offsetXEnd - offsetX < 50 && offsetYEnd - offsetY < 50)) {
 				onZoomHandler(e);
 			} else {
 				toXCenter(page);
@@ -190,7 +206,8 @@ package ui {
 			var currentStagePoint:Point = target.localToGlobal(point);
 			var yy:Number = target.y - (currentStagePoint.y - stagePoint.y);
 			//备份
-			var oldX:Number = target.x;
+			var bfX:Number = target.x;
+			var bfY:Number = target.y;
 			target.x = 0;
 			var rec:Rectangle = target.getBounds(target.stage);
 			var xx:Number = -rec.x - rec.width / 2 + target.stage.stageWidth / 2;
@@ -210,12 +227,13 @@ package ui {
 				doublePage2.x = centerLine.x + centerLine.width;
 				doublePage2.y = 0;
 				dispatchEvent(new UIEvent(UIEvent.DOUBLEPAGE_EVENT, {type: "reCenter"}));
+				target.y = bfY;
 				yy = 0;
 				needExitZoomMode = true;
 				doublePage1.visible = true;
 				doublePage2.visible = true;
 			}
-			target.x = oldX;
+			target.x = bfX;
 			target.scaleX = bfsx;
 			target.scaleY = bfsy;
 			isZooming = true;

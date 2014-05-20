@@ -17,6 +17,8 @@ package {
 
 	import scenes.LayerManager;
 
+	import ui.MouseIco;
+
 	[SWF(backgroundColor="0xF0F0F0", width=1000, height=600, frameRate="60")]
 	public class TBZBMain extends Sprite {
 		public static var st:Stage;
@@ -47,6 +49,7 @@ package {
 			var viewContainer:Sprite = new Sprite();
 			addChild(viewContainer);
 			LayerManager.initView(viewContainer);
+			MouseIco.content = LayerManager.mouseIconContainer;
 			ConfigManager.init();
 			BookManager.init();
 			ConfigManager.loadBookData();
