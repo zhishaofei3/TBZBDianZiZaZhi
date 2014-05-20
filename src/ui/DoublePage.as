@@ -389,7 +389,7 @@ package ui {
 		public function onMouseWheel(e:MouseEvent):void {
 			if (page) {
 				if (myZoomMode != ZoomMode.SC_NORMAL) {
-					page.y += e.delta * 7;
+					page.y += e.delta * 15;
 				}
 				if (page.y > 0) {
 					page.y = 0;
