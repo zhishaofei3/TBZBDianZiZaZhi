@@ -30,11 +30,11 @@ package core {
 			toolBar.centerBtns.double_btn.addEventListener(MouseEvent.CLICK, onClickDoubleBtnHandler);
 			toolBar.centerBtns.zoomIn_btn.addEventListener(MouseEvent.CLICK, onClickZoomInBtnHandler);
 			toolBar.centerBtns.zoomOut_btn.addEventListener(MouseEvent.CLICK, onClickZoomOutBtnHandler);
+			toolBar.centerBtns.huanyuan_btn.addEventListener(MouseEvent.CLICK, onClickHuanYuanBtnHandler);
 			toolBar.centerBtns.prev_btn.addEventListener(MouseEvent.CLICK, onClickPrevBtnHandler);
 			toolBar.centerBtns.next_btn.addEventListener(MouseEvent.CLICK, onClickNextBtnHandler);
 			toolBar.big_prev_btn.addEventListener(MouseEvent.CLICK, onClickPrevBtnHandler);
 			toolBar.big_next_btn.addEventListener(MouseEvent.CLICK, onClickNextBtnHandler);
-			toolBar.close_btn.addEventListener(MouseEvent.CLICK, onClickCloseBtnHandler);
 			toolBar.centerBtns.pageInput_mc.pageInput_txt.restrict = "0-9";
 			toolBar.addEventListener(FocusEvent.FOCUS_IN, onFocusInHandler);
 			resize();
@@ -99,6 +99,10 @@ package core {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "zoomOut"}));
 		}
 
+		private function onClickHuanYuanBtnHandler(e:MouseEvent):void {
+			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "huanyuan"}));
+		}
+
 		private function onClickPrevBtnHandler(e:MouseEvent):void {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "prev"}));
 		}
@@ -107,12 +111,7 @@ package core {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "next"}));
 		}
 
-		private function onClickCloseBtnHandler(e:MouseEvent):void {
-			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "close"}));
-		}
-
 		public function resize():void {
-			toolBar.close_btn.x = PageContainer.stageW - toolBar.close_btn.width - 10;
 			toolBar.bg.width = PageContainer.stageW;
 			toolBar.big_prev_btn.x = 20;
 			toolBar.big_next_btn.x = PageContainer.stageW - 20 - toolBar.big_next_btn.width;

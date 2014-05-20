@@ -6,6 +6,7 @@
  * Time: 14:19
  */
 package ui {
+	import data.infos.BookInfo;
 	import data.infos.PageInfo;
 
 	import events.UIEvent;
@@ -45,6 +46,7 @@ package ui {
 		private var thumbnailLoader:Loader;
 		private var bigImgLoader:Loader;
 
+		public var isLoading:Boolean;
 		private var loading:UI_LoadingBar;
 
 		public function Page() {
@@ -67,7 +69,8 @@ package ui {
 		}
 
 		private function loadBigImg():void {
-			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL + "?" + Math.random());
+			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL);
+//			var bigImgURLRequest:URLRequest = new URLRequest(pageInfo.bigURL + "?" + Math.random());
 			bigImgLoader = new Loader();
 			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
@@ -79,6 +82,7 @@ package ui {
 				var context:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, SecurityDomain.currentDomain);
 				bigImgLoader.load(bigImgURLRequest, context);
 			}
+			isLoading = true;
 			addChild(loading);
 			trace(thumbnailBmpContainer.width);
 			trace(thumbnailBmpContainer.height);
@@ -89,6 +93,7 @@ package ui {
 			if (this.contains(loading)) {
 				removeChild(loading);
 			}
+			isLoading = false;
 			bigImgBmp = e.target.content;
 			bigImgBmp.smoothing = true;
 			whb = bigImgBmp.width / bigImgBmp.height;//更新宽高比 理论上一样

@@ -87,9 +87,6 @@ package core {
 					pageContainer.refrush();
 					break;
 				case "double":
-					if (ConfigManager.pageMode == PageMode.DOUBLE) {
-						return;
-					}
 					if (PageContainer.currentPageNum % 2 == 0) {//偶数页先变成 单数页
 						PageContainer.currentPageNum--;
 					}
@@ -103,6 +100,9 @@ package core {
 				case "zoomOut":
 					pageContainer.zoomOut();
 					break;
+				case "huanyuan":
+					pageContainer.huanyuan();
+					break;
 				case "prev":
 					pageContainer.prev();
 					break;
@@ -110,9 +110,6 @@ package core {
 					pageContainer.next();
 					break;
 				case "logo":
-					pageContainer.resize();
-					break;
-				case "close":
 					break;
 				case "page":
 					var p:int = e.data.data;

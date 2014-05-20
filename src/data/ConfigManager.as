@@ -38,7 +38,7 @@ package data {
 
 		public static function loadBookData():void {
 			var loadUtil:LoadUtil = new LoadUtil();
-			loadUtil.load("loadBookData", "http://new.51tbzb.cn/Flash/GetContent?id=34", null, URLRequestMethod.POST, "data");
+			loadUtil.load("loadBookData", "http://new.51tbzb.cn/Flash/GetContent?id=31", null, URLRequestMethod.POST, "data");
 //			loadUtil.load("loadBookData", "http://new.51tbzb.cn/tbzbv1/index?action=getContent&id=1109&device=IPad", null, URLRequestMethod.POST, "data");
 			loadUtil.addEventListener("loadBookData", onLoadBookDataComplete);
 		}

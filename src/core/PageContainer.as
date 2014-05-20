@@ -5,6 +5,8 @@ package core {
 
 	import events.UIEvent;
 
+	import flash.events.MouseEvent;
+
 	import ui.DoublePage;
 	import ui.SinglePage;
 
@@ -41,6 +43,7 @@ package core {
 			bookInfo = bInfo;
 			currentPageNum = 1;
 			createPage();
+			stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelHandler);
 			this.x = (stage.stageWidth - BookWidth * 2) * 0.5;
 			this.y = (stage.stageHeight - BookHeight) * 0.5;
 			resize();
@@ -52,6 +55,11 @@ package core {
 //				doublePage.setPageAndPageInfo(currentPageNum, info, info);
 				doublePage.setPageAndPageInfo(currentPageNum, bookInfo.pageInfoList[currentPageNum - 1], bookInfo.pageInfoList[currentPageNum]);
 			}
+		}
+
+		private function onMouseWheelHandler(e:MouseEvent):void {
+			singlePage.onMouseWheel(e);
+			doublePage.onMouseWheel(e);
 		}
 
 		private function createPage():void {
@@ -102,6 +110,8 @@ package core {
 					bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
 					resize();
 					break;
+				case "reCenter":
+					resize();
 			}
 		}
 
@@ -176,7 +186,6 @@ package core {
 				if (currentPageNum < bookInfo.totalPageNum) {
 					currentPageNum++;
 				}
-				dispatchEvent(new UIEvent(UIEvent.PAGECONTAINER_EVENT, {type: "page", page: PageContainer.currentPageNum}));
 			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
 				if (currentPageNum + 2 <= bookInfo.totalPageNum) {
 					currentPageNum += 2;
@@ -203,6 +212,15 @@ package core {
 			}
 			if (ConfigManager.pageMode == PageMode.DOUBLE) {
 				doublePage.zoomOut();
+			}
+		}
+
+		public function huanyuan():void {
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				singlePage.huanyuan();
+			}
+			if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				doublePage.huanyuan();
 			}
 		}
 	}

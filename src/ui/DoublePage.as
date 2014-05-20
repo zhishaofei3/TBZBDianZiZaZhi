@@ -8,8 +8,12 @@ package ui {
 
 	import events.UIEvent;
 
+	import events.UIEvent;
+
 	import flash.display.DisplayObject;
+	import flash.display.Shape;
 	import flash.events.MouseEvent;
+	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
@@ -33,21 +37,31 @@ package ui {
 		private var offsetY:Number;
 		private var preDownTime:int;
 
+		private var centerLine:Shape;
+
 		public function DoublePage() {
+			myZoomMode = ZoomMode.SC_NORMAL;
 			initBg();
+			createCenterLine();
 		}
 
 		private function initBg():void {
+			this.filters = [new GlowFilter(0x000000, 0.6, 15, 15)];
 		}
 
 		public function setSize(w:Number, h:Number):void {
 			if (doublePage1) {
 				doublePage1.setSize(w / 2, h);
 			}
+			if (centerLine && doublePage1) {
+				centerLine.x = doublePage1.x + doublePage1.width;
+				centerLine.y = h;
+			}
 			if (doublePage2) {
 				doublePage2.setSize(w / 2, h);
-				doublePage2.x = doublePage1.x + doublePage1.width;
+				doublePage2.x = centerLine.x + centerLine.width;
 			}
+			addChild(centerLine);
 		}
 
 		private function onPageEventHandler(e:UIEvent):void {
@@ -78,15 +92,30 @@ package ui {
 			doublePage2.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
 			doublePage2.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			addChild(doublePage2);
-			_myZoomMode = ZoomMode.SC_NORMAL;
+			addChild(centerLine);
+			myZoomMode = ZoomMode.SC_NORMAL;
+		}
+
+		public function huanyuan():void {
+			var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+			trace(stageCenterPoint);
+			if (page) {
+				trace(page.globalToLocal(stageCenterPoint));
+				zoomAtPoint(page, page.globalToLocal(stageCenterPoint), "1");//还原1
+				trace("恢复");
+			}
+			myZoomMode = ZoomMode.SC_NORMAL;
 		}
 
 		private function onChoosePageHandler(e:MouseEvent):void {
+			page = e.currentTarget as Page;
+			if (isZooming || page.isLoading) {
+				return;
+			}
 			doublePage1.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			doublePage2.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			doublePage1.visible = doublePage2.visible = false;
 			trace("我隐藏了它");
-			page = e.currentTarget as Page;
 			page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
 			page.visible = true;
 			addChild(page);
@@ -102,33 +131,35 @@ package ui {
 		}
 
 		private function onMouseUpHandler(e:MouseEvent):void {
+			if (isZooming || page.isLoading) {
+				return;
+			}
 			page.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveHandler);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 			var nowTime:int = getTimer();
-			if (nowTime - preDownTime < 200) {
+			var offsetXEnd:Number = e.stageX - page.x;
+			var offsetYEnd:Number = e.stageY - page.y;
+			if (nowTime - preDownTime < 200 && (offsetXEnd - offsetX > 50 && offsetYEnd - offsetY < 50)) {
 				onZoomHandler(e);
 			} else {
-				if (page.width < stage.stageWidth) {//暂时测试
-					toCenter(page);
-				}
+				toCenter(page);
 			}
+			trace("page.y " + page.y);
+			trace("page.height " + page.height);
 		}
 
 		private function onZoomHandler(e:MouseEvent):void {
-			if (isZooming) {
-				return;
-			}
-			if (_myZoomMode == ZoomMode.SC_NORMAL) {
+			if (myZoomMode == ZoomMode.SC_NORMAL) {
 				zoomAtPoint(page, new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));//放大至1.8倍
-				_myZoomMode = ZoomMode.SC_1_5;
+				myZoomMode = ZoomMode.SC_1_5;
 				trace("自定义位置的放大 扩展至屏幕");
 			} else {
-				_myZoomMode = ZoomMode.SC_NORMAL;
 				var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
 				trace(stageCenterPoint);
 				trace(page.globalToLocal(stageCenterPoint));
-				zoomAtPoint(page, this.globalToLocal(stageCenterPoint), "1");//还原1
+				zoomAtPoint(page, page.globalToLocal(stageCenterPoint), "1");//还原1
 				trace("恢复");
+				myZoomMode = ZoomMode.SC_NORMAL;
 			}
 		}
 
@@ -162,23 +193,33 @@ package ui {
 			target.x = 0;
 			var rec:Rectangle = target.getBounds(target.stage);
 			var xx:Number = -rec.x - rec.width / 2 + target.stage.stageWidth / 2;
-			target.x = oldX;
 			if (scale == 1) {//对准y
-				xx = page.name == "doublePage1" ? 0 : doublePage1.width;
+				if (page.name == "doublePage1") {
+					xx = 0;
+				} else {
+					xx = centerLine.x + centerLine.width;
+				}
+				doublePage1.scaleX = 1;
+				doublePage1.scaleY = 1;
+				doublePage2.scaleX = 1;
+				doublePage2.scaleY = 1;
+				doublePage1.x = 0;
+				doublePage1.y = 0;
+				centerLine.x = doublePage1.x + doublePage1.width;
+				doublePage2.x = centerLine.x + centerLine.width;
+				doublePage2.y = 0;
+				dispatchEvent(new UIEvent(UIEvent.DOUBLEPAGE_EVENT, {type:"reCenter"}));
 				yy = 0;
-				scale = 1;
 				needExitZoomMode = true;
 				doublePage1.visible = true;
 				doublePage2.visible = true;
 			}
+			target.x = oldX;
 			target.scaleX = bfsx;
 			target.scaleY = bfsy;
 			isZooming = true;
-			trace("isZooming = true 2");
 			TweenMax.to(target, 0.3, {scaleX: scale, scaleY: scale, x: xx, y: yy, onComplete: function ():void {
 				isZooming = false;
-				trace("isZooming = false 2");
-				trace(doublePage2.visible);
 				if (needExitZoomMode) {
 					exitZoomMode();
 				}
@@ -196,28 +237,34 @@ package ui {
 				doublePage1.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 				doublePage2.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			}, 0);
-			_myZoomMode = ZoomMode.SC_NORMAL;
+			myZoomMode = ZoomMode.SC_NORMAL;
 			trace("经过我了");
 		}
 
 		private function toCenter(diso:DisplayObject):void {
 			TweenMax.killTweensOf(diso);
-			var oldX:Number = diso.x;
-			diso.x = 0;
-			var rec:Rectangle = diso.getBounds(diso.stage);
-			var xx:Number = -rec.x - rec.width / 2 + diso.stage.stageWidth / 2;
-			diso.x = oldX;
+			var xx:Number;
+			if (page.width < stage.stageWidth) {//暂时测试
+				var oldX:Number = diso.x;
+				diso.x = 0;
+				var rec:Rectangle = diso.getBounds(diso.stage);
+				xx = -rec.x - rec.width / 2 + diso.stage.stageWidth / 2;
+				diso.x = oldX;
+			} else {
+				xx = diso.x;
+			}
 			isZooming = true;
-			trace("isZooming = true 1");
 			TweenMax.to(diso, 0.3, {x: xx, onComplete: function ():void {
 				isZooming = false;
 				trace("结束");
-				trace("isZooming = false 1");
 			}});
 		}
 
 		public function zoomIn():void {
 			if (isZooming) {
+				return;
+			}
+			if (page && page.isLoading) {
 				return;
 			}
 			trace("缩放增加0.5");
@@ -234,24 +281,29 @@ package ui {
 			var stageCenterPoint:Point = new Point(PageContainer.stageW / 2, PageContainer.stageH / 2);
 			trace(stageCenterPoint);
 			trace(page.globalToLocal(stageCenterPoint));
-			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), 0.5);//缩放增加0.5
-			_myZoomMode = ZoomMode.SC_MORE;
+			zoomAtPoint(page, page.globalToLocal(stageCenterPoint), 0.5);//缩放增加0.5
+			myZoomMode = ZoomMode.SC_MORE;
 		}
 
 		public function zoomOut():void {
 			if (isZooming) {
 				return;
 			}
-			trace("缩放减少0.5");
-			var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
-			trace(stageCenterPoint);
-			trace(page.globalToLocal(stageCenterPoint));
-			zoomAtPoint(page, this.globalToLocal(stageCenterPoint), -0.5);//缩放减少0.5
-			_myZoomMode = ZoomMode.SC_MORE;
+			if (page) {
+				if (page.isLoading) {
+					return;
+				}
+				trace("缩放减少0.5");
+				var stageCenterPoint:Point = new Point(TBZBMain.st.stageWidth / 2, TBZBMain.st.stageHeight / 2);
+				trace(stageCenterPoint);
+				trace(page.globalToLocal(stageCenterPoint));
+				zoomAtPoint(page, page.globalToLocal(stageCenterPoint), -0.5);//缩放减少0.5
+				myZoomMode = ZoomMode.SC_MORE;
+			}
 		}
 
 		private function onMouseMoveHandler(e:MouseEvent):void {
-			if (_myZoomMode != ZoomMode.SC_NORMAL) {
+			if (myZoomMode != ZoomMode.SC_NORMAL) {
 				page.x = e.stageX - offsetX;
 				page.y = e.stageY - offsetY;
 				e.updateAfterEvent();
@@ -295,6 +347,7 @@ package ui {
 				stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpHandler);
 				page = null;
 			}
+			myZoomMode = ZoomMode.SC_NORMAL;
 		}
 
 		public function resize():void {
@@ -304,13 +357,32 @@ package ui {
 			if (doublePage2) {
 				doublePage2.resize();
 			}
-			if (page) {
-
-			}
 		}
 
 		public function get myZoomMode():String {
 			return _myZoomMode;
+		}
+
+		public function set myZoomMode(value:String):void {
+			_myZoomMode = value;
+		}
+
+		public function onMouseWheel(e:MouseEvent):void {
+			if (page) {
+				if (myZoomMode != ZoomMode.SC_NORMAL) {
+					page.y += e.delta * 7;
+				}
+				if (page.y > 0) {
+					page.y = 0;
+				}
+			}
+		}
+
+		private function createCenterLine():void {
+			centerLine = new Shape();
+			centerLine.graphics.beginFill(0xdd0000);
+			centerLine.graphics.drawRect(0, 0, 1, 1);
+			centerLine.graphics.endFill();
 		}
 	}
 }
