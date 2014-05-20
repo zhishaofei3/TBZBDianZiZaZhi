@@ -67,7 +67,7 @@ package ui {
 		}
 
 		private function onMouseDownHandler(e:MouseEvent):void {
-			if (page.isLoading) {
+			if (isZooming || page.isLoading) {
 				return;
 			}
 			preDownTime = getTimer();
@@ -118,7 +118,7 @@ package ui {
 
 		private function toCenter(diso:DisplayObject):void {
 			TweenMax.killTweensOf(diso);
-			var xx:Number, yy:Number;
+			var xx:Number;
 			if (page.width < stage.stageWidth) {//暂时测试
 				var oldX:Number = diso.x;
 				diso.x = 0;
@@ -128,13 +128,8 @@ package ui {
 			} else {
 				xx = diso.x;
 			}
-			if (page.y > 0) {
-				yy = 0;
-			} else {
-				yy = diso.y;
-			}
 			isZooming = true;
-			TweenMax.to(diso, 0.3, {x: xx, y: yy, onComplete: function ():void {
+			TweenMax.to(diso, 0.3, {x: xx, onComplete: function ():void {
 				isZooming = false;
 				trace("结束");
 			}});
@@ -261,6 +256,15 @@ package ui {
 				if (page.y > 0) {
 					page.y = 0;
 				}
+			}
+		}
+
+		public function reset():void {
+			if(page){
+				page.scaleX = 1;
+				page.scaleY = 1;
+				page.x = 0;
+				page.y = 0;
 			}
 		}
 	}

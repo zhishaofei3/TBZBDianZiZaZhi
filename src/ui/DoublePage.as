@@ -8,8 +8,6 @@ package ui {
 
 	import events.UIEvent;
 
-	import events.UIEvent;
-
 	import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.events.MouseEvent;
@@ -123,6 +121,9 @@ package ui {
 		}
 
 		private function onMouseDownHandler(e:MouseEvent):void {
+			if (isZooming || page.isLoading) {
+				return;
+			}
 			preDownTime = getTimer();
 			offsetX = e.stageX - page.x;
 			offsetY = e.stageY - page.y;
@@ -142,7 +143,7 @@ package ui {
 			if (nowTime - preDownTime < 200 && (offsetXEnd - offsetX > 50 && offsetYEnd - offsetY < 50)) {
 				onZoomHandler(e);
 			} else {
-				toCenter(page);
+				toXCenter(page);
 			}
 			trace("page.y " + page.y);
 			trace("page.height " + page.height);
@@ -208,7 +209,7 @@ package ui {
 				centerLine.x = doublePage1.x + doublePage1.width;
 				doublePage2.x = centerLine.x + centerLine.width;
 				doublePage2.y = 0;
-				dispatchEvent(new UIEvent(UIEvent.DOUBLEPAGE_EVENT, {type:"reCenter"}));
+				dispatchEvent(new UIEvent(UIEvent.DOUBLEPAGE_EVENT, {type: "reCenter"}));
 				yy = 0;
 				needExitZoomMode = true;
 				doublePage1.visible = true;
@@ -241,7 +242,7 @@ package ui {
 			trace("经过我了");
 		}
 
-		private function toCenter(diso:DisplayObject):void {
+		private function toXCenter(diso:DisplayObject):void {
 			TweenMax.killTweensOf(diso);
 			var xx:Number;
 			if (page.width < stage.stageWidth) {//暂时测试
@@ -383,6 +384,15 @@ package ui {
 			centerLine.graphics.beginFill(0xdd0000);
 			centerLine.graphics.drawRect(0, 0, 1, 1);
 			centerLine.graphics.endFill();
+		}
+
+		public function reset():void {
+			if (page) {
+				page.scaleX = 1;
+				page.scaleY = 1;
+				page.y = 0;
+				toXCenter(page);
+			}
 		}
 	}
 }

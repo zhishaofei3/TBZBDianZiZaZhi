@@ -135,8 +135,9 @@ package core {
 				}
 				if (singlePage) {
 					singlePage.setSize(w, h);
+					singlePage.reset();
 				}
-				DisObjUtil.toStageCenter(this);
+				DisObjUtil.toStageCenter(singlePage);
 			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
 				if (stageW > stageH) {
 					h = stageH;
@@ -155,9 +156,10 @@ package core {
 				}
 				if (doublePage) {
 					doublePage.setSize(w, h);
+					doublePage.reset();
 				}
 				this.x = (stageW - w) / 2;
-				DisObjUtil.toStageYCenter(this);
+				DisObjUtil.toStageYCenter(doublePage);
 			}
 			if (singlePage) {
 				singlePage.resize();
