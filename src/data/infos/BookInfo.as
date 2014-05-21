@@ -8,6 +8,8 @@ package data.infos {
 		private var _subjectName:String;
 		private var _version:String;
 		private var _gradeName:String;
+		private var _answer:PageInfo;
+
 		public function BookInfo() {
 			_pageInfoList = new Vector.<PageInfo>();
 		}
@@ -74,6 +76,14 @@ package data.infos {
 
 		public function set gradeName(value:String):void {
 			_gradeName = value;
+		}
+
+		public function get answer():PageInfo {
+			return _answer;
+		}
+
+		public function set answer(value:PageInfo):void {
+			_answer = value;
 		}
 	}
 }

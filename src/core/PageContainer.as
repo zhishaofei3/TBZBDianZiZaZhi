@@ -5,7 +5,12 @@ package core {
 
 	import events.UIEvent;
 
+	import flash.display.Bitmap;
+	import flash.display.Loader;
+	import flash.display.LoaderInfo;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
 
 	import ui.DoublePage;
 	import ui.SinglePage;
@@ -36,7 +41,12 @@ package core {
 
 		public static var currentPageNum:int;
 
+		public static var uiZoomIn:UI_ZoomIn;
+		public static var uiZoomOut:UI_ZoomOut;
+
 		public function PageContainer() {
+			uiZoomIn = new UI_ZoomIn();
+			uiZoomOut = new UI_ZoomOut();
 		}
 
 		public function initData(bInfo:BookInfo):void {
@@ -90,11 +100,19 @@ package core {
 		private function onSingleEventHandler(e:UIEvent):void {
 			switch (e.data.type) {
 				case "thumbnailImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum - 1].thumbnailImgBmp = e.data.thumbnailBmp;//缓存
+					if (e.data.pageNum == 0) {
+						bookInfo.answer.thumbnailImgBmp = e.data.thumbnailImgBmp;
+					} else {
+						bookInfo.pageInfoList[e.data.pageNum - 1].thumbnailImgBmp = e.data.thumbnailBmp;//缓存
+					}
 					resize();
 					break;
 				case "bigImgLoadComplete":
-					bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
+					if (e.data.pageNum == 0) {
+						bookInfo.answer.bigImgBmp = e.data.bigImgBmp;
+					} else {
+						bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
+					}
 					resize();
 					break;
 			}
@@ -108,10 +126,33 @@ package core {
 					break;
 				case "bigImgLoadComplete":
 					bookInfo.pageInfoList[e.data.pageNum - 1].bigImgBmp = e.data.bigImgBmp;
+					if (e.data.pageNum == 1) {
+						for (var i:int = 2; i < bookInfo.pageInfoList.length; i++) {//缓存剩余页的小图
+							var thumbnailsLoader:Loader = new Loader();
+							thumbnailsLoader.name = String(i);
+							thumbnailsLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadThumbnailComplete);
+							thumbnailsLoader.load(new URLRequest(bookInfo.pageInfoList[i].thumbnailURL));
+						}
+						var answerThumbnailsLoader:Loader = new Loader();
+						answerThumbnailsLoader.name = "answerThumbnail";
+						answerThumbnailsLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadThumbnailComplete);
+						answerThumbnailsLoader.load(new URLRequest(bookInfo.answer.thumbnailURL));
+					}
 					resize();
 					break;
 				case "reCenter":
 					resize();
+			}
+		}
+
+		private function onLoadThumbnailComplete(e:Event):void {
+			var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+			loaderInfo.removeEventListener(Event.COMPLETE, onLoadThumbnailComplete);
+			var index:String = loaderInfo.loader.name;
+			if (index == "answerThumbnail") {
+				bookInfo.answer.thumbnailImgBmp = loaderInfo.content as Bitmap;
+			} else {
+				bookInfo.pageInfoList[index].thumbnailImgBmp = loaderInfo.content as Bitmap;
 			}
 		}
 
@@ -224,6 +265,12 @@ package core {
 			if (ConfigManager.pageMode == PageMode.DOUBLE) {
 				doublePage.huanyuan();
 			}
+		}
+
+		public function showAnswer():void {
+			singlePage.clear();
+			doublePage.clear();
+			singlePage.setPageAndPageInfo(0, bookInfo.answer);
 		}
 	}
 }

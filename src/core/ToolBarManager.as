@@ -26,6 +26,7 @@ package core {
 			toolBar.logo.x = 20;
 			LayerManager.toolContainer.addChild(toolBar);
 			toolBar.logo.addEventListener(MouseEvent.CLICK, onClickLogoBtnHandler);
+			toolBar.centerBtns.dati_btn.addEventListener(MouseEvent.CLICK, onClickDatiBtnHandler);
 			toolBar.centerBtns.single_btn.addEventListener(MouseEvent.CLICK, onClickSingleBtnHandler);
 			toolBar.centerBtns.double_btn.addEventListener(MouseEvent.CLICK, onClickDoubleBtnHandler);
 			toolBar.centerBtns.zoomIn_btn.addEventListener(MouseEvent.CLICK, onClickZoomInBtnHandler);
@@ -83,6 +84,10 @@ package core {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "logo"}));
 		}
 
+		private function onClickDatiBtnHandler(e:MouseEvent):void {
+			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "dati"}));
+		}
+
 		private function onClickSingleBtnHandler(e:MouseEvent):void {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "single"}));
 		}
@@ -123,5 +128,10 @@ package core {
 		public function setBookName(s:String):void {
 			toolBar.centerBtns.bookName.text = s;
 		}
+
+		public function setDatiBtnVisible(b:Boolean):void {
+			toolBar.centerBtns.dati_btn.visible = b;
+		}
+
 	}
 }

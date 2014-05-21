@@ -11,6 +11,7 @@ package ui {
 	import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -83,14 +84,14 @@ package ui {
 			doublePage1 = new Page();
 			doublePage1.name = "doublePage1";
 			doublePage1.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
-			doublePage1.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			doublePage1.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
 			doublePage1.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			doublePage1.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			addChild(doublePage1);
 			doublePage2 = new Page();
 			doublePage2.name = "doublePage2";
 			doublePage2.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
-			doublePage2.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			doublePage2.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
 			doublePage2.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			doublePage2.addEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			addChild(doublePage2);
@@ -104,10 +105,12 @@ package ui {
 
 		private function onMouseOverIcoHandler(e:MouseEvent):void {
 			if (myZoomMode == ZoomMode.SC_NORMAL) {
-				MouseIco.addMouseIco(new UI_ZoomIn());
+				MouseIco.addMouseIco(PageContainer.uiZoomIn);
+				ExternalInterface.call("console.log" + "走你");
 			} else {
-				MouseIco.addMouseIco(new UI_ZoomOut());
+				MouseIco.addMouseIco(PageContainer.uiZoomOut);
 			}
+			e.updateAfterEvent();
 		}
 
 		public function huanyuan():void {
@@ -239,6 +242,11 @@ package ui {
 			isZooming = true;
 			TweenMax.to(target, 0.3, {scaleX: scale, scaleY: scale, x: xx, y: yy, onComplete: function ():void {
 				isZooming = false;
+				if (myZoomMode == ZoomMode.SC_NORMAL) {
+					MouseIco.addMouseIco(PageContainer.uiZoomIn);
+				} else {
+					MouseIco.addMouseIco(PageContainer.uiZoomOut);
+				}
 				if (needExitZoomMode) {
 					exitZoomMode();
 				}
@@ -348,6 +356,9 @@ package ui {
 			if (doublePage1) {
 				TweenMax.killTweensOf(doublePage1);
 				doublePage1.removeEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+				doublePage1.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
+				doublePage1.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
+				doublePage1.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 				doublePage1.destroy();
 				removeChild(doublePage1);
 				doublePage1 = null;
@@ -355,6 +366,9 @@ package ui {
 			if (doublePage2) {
 				TweenMax.killTweensOf(doublePage2);
 				doublePage2.removeEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
+				doublePage2.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
+				doublePage2.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
+				doublePage2.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 				doublePage2.destroy();
 				removeChild(doublePage2);
 				doublePage2 = null;

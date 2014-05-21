@@ -74,7 +74,6 @@ package ui {
 			bigImgLoader = new Loader();
 			bigImgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onBigImgLoadComplete);
 			bigImgLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
-			trace("我增加了PROGRESS 我是" + pageNum);
 			bigImgLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);
 			if (Security.sandboxType == Security.LOCAL_TRUSTED) {
 				bigImgLoader.load(bigImgURLRequest);
@@ -103,7 +102,6 @@ package ui {
 
 		private function onBigImgLoadProgress(e:ProgressEvent):void {
 			var jd:String = (e.bytesLoaded / e.bytesTotal * 100).toFixed(1);
-			trace("我是 " + pageNum + "我的进度 " + jd);
 			loading.loadingBar.width = int(jd);
 			loading.pText.text = jd + "%";
 //			setBrightness(thumbnailBmpContainer, -(1 - int(jd) * 0.01));//从黑暗中变明亮
@@ -134,12 +132,10 @@ package ui {
 
 		private function onBigImgLoadError(e:IOErrorEvent):void {
 			removeChild(loading);
-			trace("加载onBigImg IOError");
 			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadError"}));
 		}
 
 		private function onThumbnailImgIOError(e:IOErrorEvent):void {
-			trace("加载onThumbnailImg IOError");
 			dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadError"}));
 			loadBigImg();
 		}
@@ -155,12 +151,10 @@ package ui {
 			pageNum = pNum;
 			pageInfo = pInfo;
 			if (pageInfo.bigImgBmp) {
-				trace("加载了缓存中的大图");
 				bigImgBmpContainer.addChild(pageInfo.bigImgBmp);
 				dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "bigImgLoadComplete", bigImgBmp: pageInfo.bigImgBmp, pageNum: pageNum}));
 				return;
 			} else if (pageInfo.thumbnailImgBmp) {
-				trace("加载了缓存中的小图");
 				thumbnailBmpContainer.addChild(pageInfo.thumbnailImgBmp);
 				dispatchEvent(new UIEvent(UIEvent.PAGE_EVENT, {type: "thumbnailImgLoadComplete", thumbnailBmp: pageInfo.thumbnailImgBmp, pageNum: pageNum}));
 				loadBigImg();
@@ -190,7 +184,6 @@ package ui {
 				thumbnailLoader = null;
 			}
 			if (bigImgLoader) {
-				trace("我移除了PROGRESS 我是" + pageNum);
 				bigImgLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onBigImgLoadComplete);
 				bigImgLoader.contentLoaderInfo.removeEventListener(ProgressEvent.PROGRESS, onBigImgLoadProgress);
 				bigImgLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onBigImgLoadError);

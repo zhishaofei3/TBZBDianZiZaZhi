@@ -8,6 +8,7 @@ package core {
 
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.external.ExternalInterface;
 	import flash.ui.Keyboard;
 
 	import scenes.LayerManager;
@@ -21,8 +22,17 @@ package core {
 		}
 
 		public static function init():void {
+			ExternalInterface.addCallback("showAnswer", showAnswer);
 			initUI();
 			TBZBMain.st.addEventListener(Event.RESIZE, onResizeHandler);
+		}
+
+		public static function showAnswer():void {
+			if (pageContainer) {
+				ConfigManager.pageMode = PageMode.SINGLE;
+				pageContainer.showAnswer();
+//				toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+			}
 		}
 
 		public static function onResizeHandler(e:Event):void {
@@ -64,6 +74,7 @@ package core {
 			switch (e.data.type) {
 				case "page":
 					toolBarManager.setCurrentPage(e.data.page);
+					ExternalInterface.call("flashCallJs", "fanye", e.data.page);
 					break;
 			}
 		}
@@ -74,17 +85,29 @@ package core {
 			toolBarManager.setBookName(bInfo.gradeName + "(" + bInfo.version + ")" + " " + bInfo.year + "年 第" + bInfo.perNum + "期");
 			pageContainer.initData(bInfo);
 			toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+			if (bookInfo.answer.bigURL == "") {
+				toolBarManager.setDatiBtnVisible(false);
+			} else {
+				toolBarManager.setDatiBtnVisible(true);
+			}
 		}
 
 		private static function onToolBarEvent(e:UIEvent):void {
 			switch (e.data.type) {
-				case "single":
+				case "dati":
+					ExternalInterface.call("flashCallJs", "dati");
 					if (ConfigManager.pageMode == PageMode.SINGLE) {
 						return;
 					}
 					ConfigManager.pageMode = PageMode.SINGLE;
 					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 					pageContainer.refrush();
+					break;
+				case "single":
+					ConfigManager.pageMode = PageMode.SINGLE;
+					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+					pageContainer.refrush();
+					ExternalInterface.call("flashCallJs", "exitDati");
 					break;
 				case "double":
 					if (PageContainer.currentPageNum % 2 == 0) {//偶数页先变成 单数页
@@ -93,6 +116,7 @@ package core {
 					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 					ConfigManager.pageMode = PageMode.DOUBLE;
 					pageContainer.refrush();
+					ExternalInterface.call("flashCallJs", "exitDati");
 					break;
 				case "zoomIn":
 					pageContainer.zoomIn();
@@ -105,9 +129,11 @@ package core {
 					break;
 				case "prev":
 					pageContainer.prev();
+					ExternalInterface.call("flashCallJs", "prev");
 					break;
 				case "next":
 					pageContainer.next();
+					ExternalInterface.call("flashCallJs", "next");
 					break;
 				case "logo":
 					break;

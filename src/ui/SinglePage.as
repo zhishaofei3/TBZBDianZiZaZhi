@@ -2,6 +2,8 @@ package ui {
 
 	import com.greensock.TweenMax;
 
+	import core.PageContainer;
+
 	import data.ZoomMode;
 	import data.infos.PageInfo;
 
@@ -62,7 +64,7 @@ package ui {
 			page = new Page();
 			page.addEventListener(UIEvent.PAGE_EVENT, onPageEventHandler);
 			page.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownHandler);
-			page.addEventListener(MouseEvent.MOUSE_MOVE, onMouseOverIcoHandler);
+			page.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverIcoHandler);
 			page.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutIcoHandler);
 			addChild(page);
 			myZoomMode = ZoomMode.SC_NORMAL;
@@ -74,9 +76,9 @@ package ui {
 
 		private function onMouseOverIcoHandler(e:MouseEvent):void {
 			if (myZoomMode == ZoomMode.SC_NORMAL) {
-				MouseIco.addMouseIco(new UI_ZoomIn());
+				MouseIco.addMouseIco(PageContainer.uiZoomIn);
 			} else {
-				MouseIco.addMouseIco(new UI_ZoomOut());
+				MouseIco.addMouseIco(PageContainer.uiZoomOut);
 			}
 		}
 

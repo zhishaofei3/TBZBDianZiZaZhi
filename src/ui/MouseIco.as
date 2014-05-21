@@ -24,7 +24,6 @@
 			Mouse.show();
 			DisObjUtil.removeAllChildren(content);
 			content.removeEventListener(Event.ENTER_FRAME, mouseIcoMove);
-			content.removeEventListener(Event.ENTER_FRAME, mouseIcoMove);
 		}
 
 		private static function mouseIcoMove(e:Event):void {

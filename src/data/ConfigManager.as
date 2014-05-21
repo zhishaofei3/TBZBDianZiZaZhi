@@ -80,6 +80,7 @@ package data {
 				bookInfo.subjectName = bdata.SubjectName;//语文
 				bookInfo.version = bdata.Version;//语文社S版
 				bookInfo.gradeName = bdata.GradeName;//初一
+				bookInfo.answer = new PageInfo(bdata.answerThumb, bdata.answer);
 				for (var i:String in bdata.list) {
 					bookInfo.pageInfoList.push(new PageInfo(bdata.thumb[i], bdata.list[i]));
 				}

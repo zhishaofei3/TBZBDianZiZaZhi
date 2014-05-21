@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title></title>
+</head>
+<body style="margin: 0; padding: 0; overflow: hidden;">
+<div style="width:100%;height:100%; ">
+	<embed src="TBZBMain.swf" width="100%" height="100%" wmode="opaque" quality="high" allowscriptaccess="always" name="swf" id="swf"
+		   pluginspage="http://www.macromedia.com/go/getflashplayer">
+</div>
+<div id="dvPcard" style="position: fixed; bottom: 40px;right:0; background-color: #FFF2F2;
+                border: 1px #FCA5A5 solid;display:none">
+	<div class="card_use" style="text-align:center;"><a class="media {width:500, height:20}"></a></div>
+
+	<h3 style="text-align: center;">
+		同步练习</h3>
+	<div class="card_use" style="text-align: center;" >
+		<ul>
+			<li>
+				<label>
+					&nbsp;学校：&nbsp;</label></li>
+			<li>
+				<label>
+					&nbsp;班级：&nbsp;</label></li>
+			<li>
+				<label>
+					&nbsp;姓名：&nbsp;</label></li>
+		</ul>
+	</div>
+
+	<div id="ContentPlaceHolder1_dvContent" style="margin: 2px 2px 2px 2px;">
+		<textarea name="Answer" rows="2" cols="20" id="Answer" class="ckeditor"></textarea>
+	</div>
+	<div class="card_div">
+		<p>
+		<center>
+			<a class="card_submit" style='cursor: pointer; color:black; display:none'
+			   id="aSubmit">交&nbsp;&nbsp;审</a>
+		</center>
+		</p>
+	</div>
+</div>
+<script type="text/javascript">
+	function showAnswerSheet() {
+		if ($("#dvPcard").is(":hidden")) {
+			$("#dvPcard").show();
+		} else {
+			$("#dvPcard").hide();
+		}
+	}
+</script>
+</body>
+</html>
