@@ -12,6 +12,7 @@ package data {
 	import flash.utils.Dictionary;
 
 	import utils.common.util.LoadUtil;
+	import utils.common.util.MethodUtil;
 
 	/**
 	 * 数据加载器
@@ -41,10 +42,10 @@ package data {
 			var loadUtil:LoadUtil = new LoadUtil();
 			loadUtil.load("loadBookData", "http://new.51tbzb.cn/Flash/GetContent?id=" + id, null, URLRequestMethod.POST, "data");
 //			loadUtil.load("loadBookData", "http://new.51tbzb.cn/tbzbv1/index?action=getContent&id=1109&device=IPad", null, URLRequestMethod.POST, "data");
-			loadUtil.addEventListener("loadBookData", onLoadBookDataComplete);
+			loadUtil.addEventListener("loadBookData", MethodUtil.create(onLoadBookDataComplete, id));
 		}
 
-		private static function onLoadBookDataComplete(e:TBZBEvent):void {
+		private static function onLoadBookDataComplete(e:TBZBEvent, id:String):void {
 			var o:Object = e.data as Object;
 			if (o.status == 1) {
 				var bdata:Object = o.data;
@@ -76,13 +77,14 @@ package data {
 //				ConfigManager.pageMode = PageMode.SINGLE;
 				ConfigManager.pageMode = PageMode.DOUBLE;
 				var bookInfo:BookInfo = new BookInfo();
-				bookInfo.year = bdata.year;//2014
-				bookInfo.perNum = bdata.perNum;//16
+				bookInfo.id = id;
+				bookInfo.perNum = bdata.perNum;
+				bookInfo.year = bdata.year;//2014//16
 				bookInfo.subjectName = bdata.subjectName;//语文
 				bookInfo.version = bdata.version;//语文社S版
 				bookInfo.gradeName = bdata.gradeName;//初一
 				for (var i:String in bdata.neighbor) {//附近的书
-					bookInfo.neighbor.push(new OtherBookInfo(bdata.neighbor[i].id, bdata.neighbor[i].perNum, bdata.neighbor[i].year));
+					bookInfo.neighbor.push(new OtherBookInfo(bdata.neighbor[i].id, bdata.gradeName, bdata.version, bdata.subjectName, bdata.neighbor[i].year, bdata.neighbor[i].perNum));
 				}
 				bookInfo.answer = new PageInfo(bdata.answerThumb, bdata.answer);
 				for (i in bdata.list) {

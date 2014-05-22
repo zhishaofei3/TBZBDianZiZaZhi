@@ -73,6 +73,16 @@ package core {
 		}
 
 		private function createPage():void {
+			if(singlePage){
+				singlePage.removeEventListener(UIEvent.SINGLEPAGE_EVENT, onSingleEventHandler);
+				singlePage.clear();
+				removeChild(singlePage);
+			}
+			if(doublePage){
+				doublePage.removeEventListener(UIEvent.DOUBLEPAGE_EVENT, onDoubleEventHandler);
+				doublePage.clear();
+				removeChild(doublePage);
+			}
 			singlePage = new SinglePage();
 			singlePage.addEventListener(UIEvent.SINGLEPAGE_EVENT, onSingleEventHandler);
 			addChild(singlePage);

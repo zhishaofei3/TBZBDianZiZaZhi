@@ -125,10 +125,10 @@ package ui {
 		}
 
 		private function onChoosePageHandler(e:MouseEvent):void {
-			page = e.currentTarget as Page;
-			if (isZooming || page.isLoading) {
+			if (isZooming || e.currentTarget.isLoading) {
 				return;
 			}
+			page = e.currentTarget as Page;
 			doublePage1.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			doublePage2.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 			doublePage1.visible = doublePage2.visible = false;
@@ -297,6 +297,9 @@ package ui {
 			trace("缩放增加0.5");
 			if (!page) {
 				page = doublePage1;
+				if (page.isLoading) {
+					return;
+				}
 				doublePage1.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 				doublePage2.removeEventListener(MouseEvent.CLICK, onChoosePageHandler);
 				doublePage1.visible = doublePage2.visible = false;

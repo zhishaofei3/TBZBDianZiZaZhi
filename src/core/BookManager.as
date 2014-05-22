@@ -16,7 +16,7 @@ package core {
 	public class BookManager {
 		private static var pageContainer:PageContainer;
 		private static var toolBarManager:ToolBarManager;
-		private static var bookInfo:BookInfo;
+		public static var bookInfo:BookInfo;
 
 		public function BookManager() {
 		}
@@ -83,6 +83,7 @@ package core {
 			bookInfo = bInfo;
 			toolBarManager.setTotalPage(bInfo.totalPageNum);
 			toolBarManager.setBookName(bInfo.gradeName + "(" + bInfo.version + ")" + " " + bInfo.year + "年 第" + bInfo.perNum + "期");
+			toolBarManager.setNeighbor(bInfo.neighbor);
 			pageContainer.initData(bInfo);
 			toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 			if (bookInfo.answer.bigURL == "") {

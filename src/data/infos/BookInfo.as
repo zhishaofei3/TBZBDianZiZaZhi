@@ -10,6 +10,7 @@ package data.infos {
 		private var _gradeName:String;
 		private var _answer:PageInfo;
 		private var _neighbor:Vector.<OtherBookInfo>;
+		private var _id:String;
 
 		public function BookInfo() {
 			_pageInfoList = new Vector.<PageInfo>();
@@ -94,6 +95,14 @@ package data.infos {
 
 		public function set neighbor(value:Vector.<OtherBookInfo>):void {
 			_neighbor = value;
+		}
+
+		public function get id():String {
+			return _id;
+		}
+
+		public function set id(value:String):void {
+			_id = value;
 		}
 	}
 }

@@ -7,6 +7,7 @@
 package core {
 	import data.ConfigManager;
 	import data.PageMode;
+	import data.infos.OtherBookInfo;
 
 	import events.UIEvent;
 
@@ -14,6 +15,7 @@ package core {
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	import flash.ui.Keyboard;
 
 	import scenes.LayerManager;
@@ -28,9 +30,12 @@ package core {
 			toolBar.alpha = 0.8;
 			toolBar.logo.x = 20;
 			LayerManager.toolContainer.addChild(toolBar);
+			toolBar.centerBtns.bookName_mc.openPanel_spr.visible = false;
 			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = false;
 			toolBar.logo.addEventListener(MouseEvent.CLICK, onClickLogoBtnHandler);
-			toolBar.centerBtns.bookName_btn.addEventListener(MouseEvent.CLICK, onClickBookNameBtnHandler);
+			toolBar.centerBtns.bookName_mc.bookName_btn.buttonMode = true;
+			toolBar.centerBtns.bookName_mc.bookName_btn.mouseChildren = false;
+			toolBar.centerBtns.bookName_mc.bookName_btn.addEventListener(MouseEvent.CLICK, onClickBookNameBtnHandler);
 			toolBar.centerBtns.dati_btn.addEventListener(MouseEvent.CLICK, onClickDatiBtnHandler);
 			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.addEventListener(MouseEvent.CLICK, onClickQieHuanMCHandler);
 			toolBar.centerBtns.qiehuan_mc.openPanel_spr.single_btn.addEventListener(MouseEvent.CLICK, onClickSingleBtnHandler);
@@ -49,7 +54,6 @@ package core {
 
 		private function onClickQieHuanMCHandler(e:MouseEvent):void {
 			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = !toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible;
-			trace(toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible);
 		}
 
 		private function onFocusInHandler(e:FocusEvent):void {
@@ -96,7 +100,7 @@ package core {
 		}
 
 		private function onClickBookNameBtnHandler(e:MouseEvent):void {
-
+			toolBar.centerBtns.bookName_mc.openPanel_spr.visible = !toolBar.centerBtns.bookName_mc.openPanel_spr.visible;
 		}
 
 		private function onClickDatiBtnHandler(e:MouseEvent):void {
@@ -143,7 +147,7 @@ package core {
 		}
 
 		public function setBookName(s:String):void {
-			toolBar.centerBtns.bookName_btn.bookName.text = s;
+			toolBar.centerBtns.bookName_mc.bookName_btn.bookName.text = s;
 		}
 
 		public function setDatiBtnVisible(b:Boolean):void {
@@ -160,6 +164,59 @@ package core {
 			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.upState.getChildAt(2).text = s;
 			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.overState.getChildAt(2).text = s;
 			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.downState.getChildAt(2).text = s;
+		}
+
+		public function setNeighbor(neighbor:Vector.<OtherBookInfo>):void {
+			var btn:UI_OldBookBtn;
+			for (var j:int = 0; j < toolBar.centerBtns.bookName_mc.openPanel_spr.container.numChildren; j++) {
+				btn = toolBar.centerBtns.bookName_mc.openPanel_spr.container.getChildAt(j);
+				btn.removeEventListener(MouseEvent.CLICK, onClickOldBookBtnHandler);
+				btn.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOverOtherBookBtnBtnHandler);
+				btn.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOutOtherBookBtnBtnHandler);
+				toolBar.centerBtns.bookName_mc.openPanel_spr.container.removeChild(btn)
+			}
+			DisObjUtil.removeAllChildren(toolBar.centerBtns.bookName_mc.openPanel_spr.container);
+			//
+			toolBar.centerBtns.bookName_mc.openPanel_spr.btnGroup_bg.height = 0;
+			var th:Number = 3;
+			var sh:Number = 28;
+			var otherBookName:String;
+			var otherBookInfo:OtherBookInfo;
+			for (var i:String in neighbor) {
+				otherBookInfo = neighbor[i];
+				otherBookName = otherBookInfo.gradeName + "(" + otherBookInfo.version + ")" + " " + otherBookInfo.year + "年 第" + otherBookInfo.perNum + "期";
+				btn = new UI_OldBookBtn();
+				btn.name = otherBookInfo.id;
+				btn.bookName_txt.text = otherBookName;
+				btn.buttonMode = true;
+				btn.mouseChildren = false;
+				btn.x = 6;
+				btn.y = th;
+				th += sh + 2;
+				if (otherBookInfo.id == BookManager.bookInfo.id) {
+					btn.alpha = 0.7;
+				} else {
+					btn.addEventListener(MouseEvent.CLICK, onClickOldBookBtnHandler);
+					btn.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverOtherBookBtnBtnHandler);
+					btn.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutOtherBookBtnBtnHandler);
+				}
+				toolBar.centerBtns.bookName_mc.openPanel_spr.container.addChild(btn);
+			}
+			toolBar.centerBtns.bookName_mc.openPanel_spr.btnGroup_bg.height = th + 2;
+		}
+
+		private function onMouseOutOtherBookBtnBtnHandler(e:MouseEvent):void {
+			e.currentTarget.x = 6;
+		}
+
+		private function onMouseOverOtherBookBtnBtnHandler(e:MouseEvent):void {
+			e.currentTarget.x = 8;
+		}
+
+		private function onClickOldBookBtnHandler(e:MouseEvent):void {
+			toolBar.centerBtns.bookName_mc.openPanel_spr.visible = false;
+			ConfigManager.loadBookData(e.currentTarget.name);
+			ExternalInterface.call("flashCallJs", "huanShu", e.currentTarget.name);
 		}
 	}
 }
