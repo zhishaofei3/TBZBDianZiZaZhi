@@ -104,6 +104,7 @@ package ui {
 			var jd:String = (e.bytesLoaded / e.bytesTotal * 100).toFixed(1);
 			loading.loadingBar.width = int(jd);
 			loading.pText.text = jd + "%";
+			trace(jd + "%");
 //			setBrightness(thumbnailBmpContainer, -(1 - int(jd) * 0.01));//从黑暗中变明亮
 		}
 

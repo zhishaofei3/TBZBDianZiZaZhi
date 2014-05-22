@@ -52,7 +52,8 @@ package {
 			MouseIco.content = LayerManager.mouseIconContainer;
 			ConfigManager.init();
 			BookManager.init();
-			ConfigManager.loadBookData();
+			var id:String = root.loaderInfo.parameters["pdfId"];
+			ConfigManager.loadBookData(id);
 			BookManager.onResizeHandler(null);
 		}
 	}

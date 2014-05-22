@@ -5,6 +5,9 @@
  * Time: 13:53
  */
 package core {
+	import data.ConfigManager;
+	import data.PageMode;
+
 	import events.UIEvent;
 
 	import flash.events.EventDispatcher;
@@ -25,10 +28,13 @@ package core {
 			toolBar.alpha = 0.8;
 			toolBar.logo.x = 20;
 			LayerManager.toolContainer.addChild(toolBar);
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = false;
 			toolBar.logo.addEventListener(MouseEvent.CLICK, onClickLogoBtnHandler);
+			toolBar.centerBtns.bookName_btn.addEventListener(MouseEvent.CLICK, onClickBookNameBtnHandler);
 			toolBar.centerBtns.dati_btn.addEventListener(MouseEvent.CLICK, onClickDatiBtnHandler);
-			toolBar.centerBtns.single_btn.addEventListener(MouseEvent.CLICK, onClickSingleBtnHandler);
-			toolBar.centerBtns.double_btn.addEventListener(MouseEvent.CLICK, onClickDoubleBtnHandler);
+			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.addEventListener(MouseEvent.CLICK, onClickQieHuanMCHandler);
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.single_btn.addEventListener(MouseEvent.CLICK, onClickSingleBtnHandler);
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.double_btn.addEventListener(MouseEvent.CLICK, onClickDoubleBtnHandler);
 			toolBar.centerBtns.zoomIn_btn.addEventListener(MouseEvent.CLICK, onClickZoomInBtnHandler);
 			toolBar.centerBtns.zoomOut_btn.addEventListener(MouseEvent.CLICK, onClickZoomOutBtnHandler);
 			toolBar.centerBtns.huanyuan_btn.addEventListener(MouseEvent.CLICK, onClickHuanYuanBtnHandler);
@@ -39,6 +45,11 @@ package core {
 			toolBar.centerBtns.pageInput_mc.pageInput_txt.restrict = "0-9";
 			toolBar.addEventListener(FocusEvent.FOCUS_IN, onFocusInHandler);
 			resize();
+		}
+
+		private function onClickQieHuanMCHandler(e:MouseEvent):void {
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = !toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible;
+			trace(toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible);
 		}
 
 		private function onFocusInHandler(e:FocusEvent):void {
@@ -84,15 +95,21 @@ package core {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "logo"}));
 		}
 
+		private function onClickBookNameBtnHandler(e:MouseEvent):void {
+
+		}
+
 		private function onClickDatiBtnHandler(e:MouseEvent):void {
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "dati"}));
 		}
 
 		private function onClickSingleBtnHandler(e:MouseEvent):void {
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = false;
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "single"}));
 		}
 
 		private function onClickDoubleBtnHandler(e:MouseEvent):void {
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = false;
 			dispatchEvent(new UIEvent(UIEvent.TOOLBARMANAGER_EVENT, {type: "double"}));
 		}
 
@@ -126,12 +143,23 @@ package core {
 		}
 
 		public function setBookName(s:String):void {
-			toolBar.centerBtns.bookName.text = s;
+			toolBar.centerBtns.bookName_btn.bookName.text = s;
 		}
 
 		public function setDatiBtnVisible(b:Boolean):void {
 			toolBar.centerBtns.dati_btn.visible = b;
 		}
 
+		public function changeModeTypeString():void {
+			var s:String;
+			if (ConfigManager.pageMode == PageMode.SINGLE) {
+				s = "单页";
+			} else if (ConfigManager.pageMode == PageMode.DOUBLE) {
+				s = "双页";
+			}
+			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.upState.getChildAt(2).text = s;
+			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.overState.getChildAt(2).text = s;
+			toolBar.centerBtns.qiehuan_mc.qiehuan_btn.downState.getChildAt(2).text = s;
+		}
 	}
 }

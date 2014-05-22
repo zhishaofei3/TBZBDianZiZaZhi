@@ -9,9 +9,11 @@ package data.infos {
 		private var _version:String;
 		private var _gradeName:String;
 		private var _answer:PageInfo;
+		private var _neighbor:Vector.<OtherBookInfo>;
 
 		public function BookInfo() {
 			_pageInfoList = new Vector.<PageInfo>();
+			_neighbor = new Vector.<OtherBookInfo>();
 		}
 
 		public function get totalPageNum():int {
@@ -84,6 +86,14 @@ package data.infos {
 
 		public function set answer(value:PageInfo):void {
 			_answer = value;
+		}
+
+		public function get neighbor():Vector.<OtherBookInfo> {
+			return _neighbor;
+		}
+
+		public function set neighbor(value:Vector.<OtherBookInfo>):void {
+			_neighbor = value;
 		}
 	}
 }

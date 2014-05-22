@@ -100,12 +100,14 @@ package core {
 						return;
 					}
 					ConfigManager.pageMode = PageMode.SINGLE;
+					toolBarManager.changeModeTypeString();
 					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 					pageContainer.refrush();
 					break;
 				case "single":
 					ConfigManager.pageMode = PageMode.SINGLE;
 					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
+					toolBarManager.changeModeTypeString();
 					pageContainer.refrush();
 					ExternalInterface.call("flashCallJs", "exitDati");
 					break;
@@ -115,6 +117,7 @@ package core {
 					}
 					toolBarManager.setCurrentPage(PageContainer.currentPageNum);
 					ConfigManager.pageMode = PageMode.DOUBLE;
+					toolBarManager.changeModeTypeString();
 					pageContainer.refrush();
 					ExternalInterface.call("flashCallJs", "exitDati");
 					break;
