@@ -5,6 +5,8 @@
  * Time: 13:53
  */
 package core {
+	import com.greensock.TweenLite;
+
 	import data.ConfigManager;
 	import data.PageMode;
 	import data.infos.OtherBookInfo;
@@ -49,11 +51,44 @@ package core {
 			toolBar.big_next_btn.addEventListener(MouseEvent.CLICK, onClickNextBtnHandler);
 			toolBar.centerBtns.pageInput_mc.pageInput_txt.restrict = "0-9";
 			toolBar.addEventListener(FocusEvent.FOCUS_IN, onFocusInHandler);
+			toolBar.addEventListener(MouseEvent.ROLL_OVER, onToolBarRollOverHandler);
+			toolBar.addEventListener(MouseEvent.ROLL_OUT, onToolBarRollOutHandler);
 			resize();
+		}
+
+		private function onToolBarRollOverHandler(e:MouseEvent):void {
+			if (e.target.name == "big_prev_btn" || e.target.name == "big_next_btn") {
+				return;
+			}
+			trace("onToolBarRollOverHandler " + e.target);
+			trace("onToolBarRollOverHandler " + e.target.name);
+			TweenLite.killTweensOf(toolBar);
+			TweenLite.to(toolBar.centerBtns, 0.5, {alpha: 1});
+			TweenLite.to(toolBar.logo, 0.5, {alpha: 1});
+			TweenLite.to(toolBar.bg, 0.5, {alpha: 1});
+		}
+
+		private function onToolBarRollOutHandler(e:MouseEvent):void {
+			if (e.target.name == "big_prev_btn" || e.target.name == "big_next_btn") {
+				return;
+			}
+			trace("onToolBarRollOutHandler " + e.target);
+			trace("onToolBarRollOutHandler " + e.target.name);
+			TweenLite.killTweensOf(toolBar);
+			TweenLite.to(toolBar.centerBtns, 0.5, {alpha: 0});
+			TweenLite.to(toolBar.logo, 0.5, {alpha: 0});
+			TweenLite.to(toolBar.bg, 0.5, {alpha: 0});
+			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = false;
+			toolBar.centerBtns.bookName_mc.openPanel_spr.visible = false;
 		}
 
 		private function onClickQieHuanMCHandler(e:MouseEvent):void {
 			toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible = !toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible;
+			if (toolBar.centerBtns.qiehuan_mc.openPanel_spr.visible) {
+				toolBar.bg.removeEventListener(MouseEvent.MOUSE_OUT, onToolBarRollOutHandler);
+			} else {
+				toolBar.bg.addEventListener(MouseEvent.MOUSE_OUT, onToolBarRollOutHandler);
+			}
 		}
 
 		private function onFocusInHandler(e:FocusEvent):void {
@@ -101,6 +136,11 @@ package core {
 
 		private function onClickBookNameBtnHandler(e:MouseEvent):void {
 			toolBar.centerBtns.bookName_mc.openPanel_spr.visible = !toolBar.centerBtns.bookName_mc.openPanel_spr.visible;
+			if (toolBar.centerBtns.bookName_mc.openPanel_spr.visible) {
+				toolBar.bg.removeEventListener(MouseEvent.MOUSE_OUT, onToolBarRollOutHandler);
+			} else {
+				toolBar.bg.addEventListener(MouseEvent.MOUSE_OUT, onToolBarRollOutHandler);
+			}
 		}
 
 		private function onClickDatiBtnHandler(e:MouseEvent):void {
