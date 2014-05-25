@@ -179,6 +179,7 @@ package core {
 
 		public function resize():void {
 			toolBar.bg.width = PageContainer.stageW;
+			toolBar.kongbai_mc.width = PageContainer.stageW;
 			toolBar.big_prev_btn.x = 20;
 			toolBar.big_next_btn.x = PageContainer.stageW - 20 - toolBar.big_next_btn.width;
 			DisObjUtil.toStageYCenter(toolBar.big_next_btn);
