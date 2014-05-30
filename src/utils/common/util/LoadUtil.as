@@ -29,6 +29,7 @@
 			eventType = listener;
 			saveType = _saveType;
 			loader = new URLLoader();
+			trace("loader");
 			loader.dataFormat = URLLoaderDataFormat.BINARY;
 			loader.addEventListener(Event.COMPLETE, onComplete);
 			loader.addEventListener(IOErrorEvent.IO_ERROR, onIOErrorEvent);
