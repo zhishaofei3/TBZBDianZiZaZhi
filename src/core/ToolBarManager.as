@@ -60,8 +60,6 @@ package core {
 			if (e.target.name == "big_prev_btn" || e.target.name == "big_next_btn") {
 				return;
 			}
-			trace("onToolBarRollOverHandler " + e.target);
-			trace("onToolBarRollOverHandler " + e.target.name);
 			TweenLite.killTweensOf(toolBar);
 			TweenLite.to(toolBar.centerBtns, 0.5, {alpha: 1});
 			TweenLite.to(toolBar.logo, 0.5, {alpha: 1});
@@ -72,8 +70,6 @@ package core {
 			if (e.target.name == "big_prev_btn" || e.target.name == "big_next_btn") {
 				return;
 			}
-			trace("onToolBarRollOutHandler " + e.target);
-			trace("onToolBarRollOutHandler " + e.target.name);
 			TweenLite.killTweensOf(toolBar);
 			TweenLite.to(toolBar.centerBtns, 0.5, {alpha: 0});
 			TweenLite.to(toolBar.logo, 0.5, {alpha: 0});

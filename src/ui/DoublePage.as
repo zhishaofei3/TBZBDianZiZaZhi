@@ -143,6 +143,7 @@ package ui {
 			if (isZooming || page.isLoading) {
 				return;
 			}
+			trace("可以移");
 			preDownTime = getTimer();
 			offsetX = e.stageX - page.x;
 			offsetY = e.stageY - page.y;
@@ -162,7 +163,7 @@ package ui {
 			if ((nowTime - preDownTime < 200) && (offsetXEnd - offsetX < 50 && offsetYEnd - offsetY < 50)) {
 				onZoomHandler(e);
 			} else {
-				toXCenter(page);
+//				toXCenter(page);
 			}
 			trace("page.y " + page.y);
 			trace("page.height " + page.height);
